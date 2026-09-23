@@ -35,6 +35,6 @@ target_link_libraries(rlimgui PUBLIC raylib imgui)
 # Engine
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS source/*.cpp source/*.h)
 
-add_executable(KYEightEngine "source/main.cpp" ${ENGINE_SOURCES})
+add_executable(KYEightEngine ${ENGINE_SOURCES})
 
 target_link_libraries(KYEightEngine PRIVATE raylib imgui rlimgui)
