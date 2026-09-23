@@ -37,4 +37,6 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS source/*.cpp source/*.h)
 
 add_executable(KYEightEngine ${ENGINE_SOURCES})
 
+target_include_directories(KYEightEngine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
+
 target_link_libraries(KYEightEngine PRIVATE raylib imgui rlimgui)

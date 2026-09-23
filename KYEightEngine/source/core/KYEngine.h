@@ -1,5 +1,7 @@
 #pragma once
+#include "renderer/KYRenderer.h"
 
+#include <iostream>
 namespace KYEight 
 {
 	class KYEngine
@@ -8,6 +10,7 @@ namespace KYEight
 		KYEngine();
 		~KYEngine();
 
+		// Disable move and copy semantics
 		KYEngine(const KYEngine&) = delete;
 		KYEngine& operator=(const KYEngine&) = delete;
 
@@ -19,5 +22,9 @@ namespace KYEight
 		void Shutdown();
 
 	private:
+		void Update();
+
+		KYRenderer* renderer;
+
 	};
 }

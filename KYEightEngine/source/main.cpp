@@ -1,41 +1,26 @@
 #include "core/KYEngine.h"
 
-#include <iostream>
-#include <raylib.h>
-#include "rlImGui.h"
-#include "imgui.h"
-
+// TO DO:
+/*
+- ImGui engine UI for development
+- Logger/profiler when engine ImGui is implemented. Will write to console in engine UI or somet
+*/
 int main() 
 {
-	InitWindow(1280, 720, "KYEightEngine");
+	// Create engine 
+	KYEight::KYEngine engine;
 
-	rlImGuiSetup(true);
-
-	while(!WindowShouldClose()) 
+	// Create engine and all resources
+	if (!engine.Initialize()) 
 	{
-		BeginDrawing();
-		ClearBackground(RAYWHITE);
-
-		rlImGuiBegin();
-
-		ImGui::Begin("KYEightEngine");
-
-		ImGui::Text("Work please");
-
-		if (ImGui::Button("Hello"))
-		{
-			std::cout << "Works!\n";
-		}
-
-		ImGui::End();
-
-		rlImGuiEnd();
-
-		EndDrawing();
+		return -1;
 	}
-	rlImGuiShutdown();
 
-	CloseWindow();
+	// Game loop (Update, Render, Input)
+	engine.Run();
+
+	// Clean up resources
+	engine.Shutdown();
 
 	return 0;
 }
