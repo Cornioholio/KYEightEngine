@@ -11,7 +11,7 @@ include(FetchContent)
 FetchContent_Declare(raylib GIT_REPOSITORY https://github.com/raysan5/raylib.git GIT_TAG 5.5)
 FetchContent_MakeAvailable(raylib)
 
-# ImGUI
+# Dear ImGUI
 FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git GIT_TAG v1.92.7)
 FetchContent_MakeAvailable(imgui)
 
@@ -33,10 +33,14 @@ target_include_directories(rlimgui PUBLIC ${rlimgui_SOURCE_DIR})
 target_link_libraries(rlimgui PUBLIC raylib imgui)
 
 # Engine
-file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS source/*.cpp source/*.h)
+file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS engine/source/*.cpp engine/source/*.h)
 
-add_executable(KYEightEngine ${ENGINE_SOURCES})
+add_library(KYEightEngine STATIC ${ENGINE_SOURCES})
 
-target_include_directories(KYEightEngine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
+target_include_directories(KYEightEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/engine/source)
 
-target_link_libraries(KYEightEngine PRIVATE raylib imgui rlimgui)
+target_link_libraries(KYEightEngine PUBLIC raylib imgui rlimgui)
+
+# Editor
+add_executable(KYEightEditor editor/source/main.cpp)
+target_link_libraries(KYEightEditor PRIVATE KYEightEngine)
