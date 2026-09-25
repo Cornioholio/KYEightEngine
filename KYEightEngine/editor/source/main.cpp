@@ -1,5 +1,4 @@
-#include "core/KYEngine.h"
-
+#include "KYEditor.h"
 // TO DO:
 /*
 - ImGui engine UI for development
@@ -8,19 +7,19 @@
 int main() 
 {
 	// Create engine 
-	KYEight::KYEngine engine;
+	KYEightEditor::KYEditor editor;
 
 	// Create engine and all resources
-	if (!engine.Initialize()) 
+	if (!editor.Initialise())
 	{
 		return -1;
 	}
 
 	// Game loop (Update, Render, Input)
-	engine.Run();
+	editor.Run();
 
 	// Clean up resources
-	engine.Shutdown();
+	editor.Shutdown();
 
 	return 0;
 }

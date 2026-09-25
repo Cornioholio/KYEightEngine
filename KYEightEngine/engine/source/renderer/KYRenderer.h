@@ -1,9 +1,8 @@
 #pragma once
 #include "raylib.h"
-#include "rlImGui.h"
-#include "imgui.h"
 
 #include <iostream>
+
 namespace KYEight 
 {
 	class KYRenderer
@@ -19,11 +18,8 @@ namespace KYEight
 		KYRenderer(const KYRenderer&&) = delete;
 		KYRenderer& operator=(KYRenderer&&) = delete;
 
-		bool Initialize();
-		void CreateWindow();
-
+		bool Initialise();
 		void RenderFrame();
-
 		void Shutdown();
 
 	private:
@@ -31,5 +27,6 @@ namespace KYEight
 		unsigned int windowWidth = 1920;
 
 		const char* windowHandle = "She's turned the weans against us";
+
 	};
 }

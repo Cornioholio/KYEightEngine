@@ -43,8 +43,13 @@ add_library(KYEightEngine STATIC ${ENGINE_SOURCES})
 
 target_include_directories(KYEightEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/engine/source)
 
-target_link_libraries(KYEightEngine PUBLIC raylib imgui rlimgui Jolt)
+target_link_libraries(KYEightEngine PUBLIC raylib Jolt)
 
 # Editor
-add_executable(KYEightEditor editor/source/main.cpp)
-target_link_libraries(KYEightEditor PRIVATE KYEightEngine)
+file(GLOB_RECURSE EDITOR_SOURCES CONFIGURE_DEPENDS editor/source/*.cpp editor/source/*.h)
+
+add_executable(KYEightEditor ${EDITOR_SOURCES})
+
+target_include_directories(KYEightEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/editor/source)
+
+target_link_libraries(KYEightEditor PRIVATE KYEightEngine imgui rlimgui)

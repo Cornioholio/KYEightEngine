@@ -13,7 +13,7 @@ namespace KYEight
 	}
 
 
-	bool KYEngine::Initialize() 
+	bool KYEngine::Initialise() 
 	{
 		// Initialize systems
 		if (renderer == nullptr) 
@@ -21,7 +21,7 @@ namespace KYEight
 			std::cout << "[ENGINE] No instance of renderer exists, could not intiailize renderer\n";
 			return false;
 		}
-		if (!renderer->Initialize()) 
+		if (!renderer->Initialise()) 
 		{
 			std::cout << "[ENGINE} Failed to intialize renderer\n";
 			return false;
@@ -32,13 +32,23 @@ namespace KYEight
 	void KYEngine::Run() 
 	{
 		// Game loop
-		while(!WindowShouldClose()) 
+		while (!WindowShouldClose()) 
 		{
-			renderer->RenderFrame();
+			BeginDrawing();
+
+			ClearBackground(RAYWHITE);
 
 			Update();
-
+			renderer->RenderFrame();
 			// Input when implemented
+
+			if (editorCallback) 
+			{
+				editorCallback();
+			}
+
+			EndDrawing();
+
 		}
 	}
 	void KYEngine::Shutdown() 
@@ -51,9 +61,14 @@ namespace KYEight
 
 		renderer->Shutdown();
 	}
-
 	void KYEngine::Update() 
 	{
 		
+	}
+
+
+	void KYEngine::SetEditorCallback(std::function<void()> callback)
+	{
+		editorCallback = callback;
 	}
 }

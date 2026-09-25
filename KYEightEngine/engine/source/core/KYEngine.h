@@ -1,8 +1,9 @@
 #pragma once
 #include "renderer/KYRenderer.h"
 
+#include <functional>
 #include <iostream>
-namespace KYEight 
+namespace KYEight
 {
 	class KYEngine
 	{
@@ -17,13 +18,15 @@ namespace KYEight
 		KYEngine(const KYEngine&&) = delete;
 		KYEngine& operator=(KYEngine&&) = delete;
 
-		bool Initialize();
+		bool Initialise();
 		void Run();
 		void Shutdown();
 
+		void SetEditorCallback(std::function<void()> callback);
 	private:
 		void Update();
 
+		std::function<void()> editorCallback;
 		KYRenderer* renderer;
 
 	};

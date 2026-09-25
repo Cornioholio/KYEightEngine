@@ -11,44 +11,19 @@ namespace KYEight
 		
 	}
 
-	bool KYRenderer::Initialize() 
+	bool KYRenderer::Initialise() 
 	{
-		CreateWindow();
-
 		return true;
-	}
-	void KYRenderer::CreateWindow() 
-	{
-		// Init window and create rlImGUI context
-		InitWindow(windowWidth, windowHeight, windowHandle);
-		rlImGuiSetup(true);
+
 	}
 
 	void KYRenderer::RenderFrame()
 	{
-		BeginDrawing();
-		rlImGuiBegin();
-
-		ImGui::Begin("KYEightEngine");
-
-		ImGui::Text("Work please");
-
-		if (ImGui::Button("Hello"))
-		{
-			std::cout << "Works!\n";
-		}
-
-		ImGui::End();
-
-		rlImGuiEnd();
-
-		EndDrawing();
+		// Renderer drawing
 	}
 
 	void KYRenderer::Shutdown() 
 	{
-		rlImGuiShutdown();
 
-		CloseWindow();
 	}
 }
