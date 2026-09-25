@@ -34,10 +34,6 @@ namespace KYEight
 		// Game loop
 		while (!WindowShouldClose()) 
 		{
-			BeginDrawing();
-
-			ClearBackground(RAYWHITE);
-
 			Update();
 			renderer->RenderFrame();
 			// Input when implemented
@@ -46,9 +42,6 @@ namespace KYEight
 			{
 				editorCallback();
 			}
-
-			EndDrawing();
-
 		}
 	}
 	void KYEngine::Shutdown() 
@@ -70,5 +63,9 @@ namespace KYEight
 	void KYEngine::SetEditorCallback(std::function<void()> callback)
 	{
 		editorCallback = callback;
+	}
+	RenderTexture2D KYEngine::GetViewportTexture() const
+	{
+		return renderer->GetViewportTexture();
 	}
 }

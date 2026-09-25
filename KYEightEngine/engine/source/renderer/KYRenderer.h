@@ -22,7 +22,11 @@ namespace KYEight
 		void RenderFrame();
 		void Shutdown();
 
+		RenderTexture2D GetViewportTexture() const;
+
 	private:
+		RenderTexture2D viewportTexture;
+
 		unsigned int windowHeight = 1080;
 		unsigned int windowWidth = 1920;
 
