@@ -12,10 +12,10 @@ namespace KYEight
 		~KYEngine();
 
 		// Disable move and copy semantics
-		KYEngine(const KYEngine&) = delete;
-		KYEngine& operator=(const KYEngine&) = delete;
+		KYEngine(KYEngine&) = delete;
+		KYEngine& operator=(KYEngine&) = delete;
 
-		KYEngine(const KYEngine&&) = delete;
+		KYEngine(KYEngine&&) = delete;
 		KYEngine& operator=(KYEngine&&) = delete;
 
 		bool Initialise();

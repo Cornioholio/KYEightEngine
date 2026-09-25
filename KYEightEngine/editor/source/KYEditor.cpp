@@ -4,13 +4,15 @@ namespace KYEightEditor
 {
 	bool KYEditor::Initialise() 
 	{
-		InitWindow(1920, 1080, "She's turned the weans against us");
-		SetTargetFPS(60);
+		SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+		InitWindow(editorWindowWidth, editorWindowHeight, editorWindowTitle);
+		MaximizeWindow();
 
 		if (!IsWindowReady()) 
 		{
 			return false;
 		}
+
 		
 		if (!engine.Initialise()) 
 		{
@@ -48,11 +50,12 @@ namespace KYEightEditor
 
 		rlImGuiBegin();
 
-		ImGui::Begin("KYEight editor");
+		ImGui::Begin("KYEight Viewport");
 
+		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 		RenderTexture2D viewport = engine.GetViewportTexture();
 
-		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 

@@ -12,25 +12,25 @@ namespace KYEight
 		~KYRenderer();
 
 		// Disable move and copy semantics
-		KYRenderer(const KYRenderer&) = delete;
+		KYRenderer(KYRenderer&) = delete;
 		KYRenderer& operator=(const KYRenderer&) = delete;
 
-		KYRenderer(const KYRenderer&&) = delete;
+		KYRenderer(KYRenderer&&) = delete;
 		KYRenderer& operator=(KYRenderer&&) = delete;
 
 		bool Initialise();
 		void RenderFrame();
 		void Shutdown();
 
+		void ResizeViewport(unsigned int width, unsigned int height);
 		RenderTexture2D GetViewportTexture() const;
 
 	private:
-		RenderTexture2D viewportTexture;
+		RenderTexture2D viewportTexture{};
 
-		unsigned int windowHeight = 1080;
-		unsigned int windowWidth = 1920;
+		unsigned int viewportHeight = 1280;
+		unsigned int viewportWidth = 720;
 
-		const char* windowHandle = "She's turned the weans against us";
-
+		Camera3D camera{};
 	};
 }

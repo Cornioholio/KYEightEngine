@@ -16,5 +16,11 @@ namespace KYEightEditor
 		void DrawEditorUI();
 
 		KYEight::KYEngine engine;
+	
+		unsigned int editorWindowHeight = 1080;
+		unsigned int editorWindowWidth = 1920;
+
+		const char* editorWindowTitle = "She's turned the weans against us";
+
 	};
 }
