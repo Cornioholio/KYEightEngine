@@ -23,6 +23,8 @@ namespace KYEight
 		void Shutdown();
 
 		void SetEditorCallback(std::function<void()> callback);
+
+		float GetViewportAspectRatio() const;
 		RenderTexture2D GetViewportTexture() const;
 	private:
 		void Update();

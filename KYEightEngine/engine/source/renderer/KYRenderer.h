@@ -24,12 +24,14 @@ namespace KYEight
 
 		void ResizeViewport(unsigned int width, unsigned int height);
 		RenderTexture2D GetViewportTexture() const;
-
+		float GetAspectRatio() const;
 	private:
 		RenderTexture2D viewportTexture{};
 
-		unsigned int viewportHeight = 1280;
-		unsigned int viewportWidth = 720;
+		float aspectRatio = 0.f;
+
+		unsigned int viewportHeight = 720;
+		unsigned int viewportWidth = 1280;
 
 		Camera3D camera{};
 	};

@@ -59,10 +59,14 @@ namespace KYEight
 		
 	}
 
-
 	void KYEngine::SetEditorCallback(std::function<void()> callback)
 	{
 		editorCallback = callback;
+	}
+
+	float KYEngine::GetViewportAspectRatio() const
+	{
+		return renderer->GetAspectRatio();
 	}
 	RenderTexture2D KYEngine::GetViewportTexture() const
 	{

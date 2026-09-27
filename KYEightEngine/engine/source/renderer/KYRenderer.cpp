@@ -13,7 +13,9 @@ namespace KYEight
 
 	bool KYRenderer::Initialise() 
 	{
-		viewportTexture = LoadRenderTexture(1280, 720);
+		viewportTexture = LoadRenderTexture(viewportWidth, viewportHeight);
+
+		aspectRatio = 16.0f / 9.0f;
 
 		if (viewportTexture.id == 0) 
 		{
@@ -77,8 +79,13 @@ namespace KYEight
 		viewportTexture = LoadRenderTexture(viewportWidth, viewportHeight);
 	}
 
+	float KYRenderer::GetAspectRatio() const 
+	{
+		return aspectRatio;
+	}
 	RenderTexture2D KYRenderer::GetViewportTexture() const 
 	{
 		return viewportTexture;
 	}
+
 }

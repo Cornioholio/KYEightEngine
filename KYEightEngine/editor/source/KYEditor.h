@@ -15,6 +15,8 @@ namespace KYEightEditor
 	private:
 		void DrawEditorUI();
 
+		void DrawViewport();
+
 		KYEight::KYEngine engine;
 	
 		unsigned int editorWindowHeight = 1080;
