@@ -2,6 +2,15 @@
 
 namespace KYEightEditor 
 {
+	KYEditor::KYEditor() 
+	{
+	
+	}
+	KYEditor::~KYEditor() 
+	{
+		
+	}
+
 	bool KYEditor::Initialise() 
 	{
 		// Set editor window properties, resizable and vsync 
@@ -32,14 +41,19 @@ namespace KYEightEditor
 		// Editor runtime
 		while (!WindowShouldClose()) 
 		{
-			// This might change
+			// Play session only updates when play is pressed, engine & ui rendering always happens 
+			playSession.Update(engine);
+
 			engine.Render();
+
 			DrawEditorUI();
 		}
 	}
 	void KYEditor::Shutdown() 
 	{
 		// Shutdown editor and clean up
+		playSession.Stop(engine);
+
 		rlImGuiShutdown();
 
 		engine.Shutdown();
@@ -56,6 +70,7 @@ namespace KYEightEditor
 		rlImGuiBegin();
 
 		DrawViewport();
+		DrawToolbar();
 
 		rlImGuiEnd();
 
@@ -91,5 +106,22 @@ namespace KYEightEditor
 		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(viewportWidth, viewportHeight), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
+	}
+	void KYEditor::DrawToolbar() 
+	{
+		if (!playSession.isPlaying()) 
+		{
+			if (ImGui::Button("Play")) 
+			{
+				playSession.Start(engine);
+			}
+		}
+		else 
+		{
+			if (ImGui::Button("Stop")) 
+			{
+				playSession.Stop(engine);
+			}
+		}
 	}
 }

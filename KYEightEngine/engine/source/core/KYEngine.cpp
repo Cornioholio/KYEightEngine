@@ -41,13 +41,14 @@ namespace KYEight
 	}
 	void KYEngine::Update() 
 	{
-		
+		std::cout << "Playing!\n";
 	}
 	void KYEngine::Render() 
 	{
 		renderer->RenderFrame();
 	}
 
+	// For editor use
 	float KYEngine::GetViewportAspectRatio() const
 	{
 		return renderer->GetAspectRatio();
