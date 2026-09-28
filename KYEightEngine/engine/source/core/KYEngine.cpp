@@ -29,21 +29,6 @@ namespace KYEight
 		return true;
 
 	}
-	void KYEngine::Run() 
-	{
-		// Game loop
-		while (!WindowShouldClose()) 
-		{
-			Update();
-			renderer->RenderFrame();
-			// Input when implemented
-
-			if (editorCallback) 
-			{
-				editorCallback();
-			}
-		}
-	}
 	void KYEngine::Shutdown() 
 	{
 		// Shut down systems
@@ -58,10 +43,9 @@ namespace KYEight
 	{
 		
 	}
-
-	void KYEngine::SetEditorCallback(std::function<void()> callback)
+	void KYEngine::Render() 
 	{
-		editorCallback = callback;
+		renderer->RenderFrame();
 	}
 
 	float KYEngine::GetViewportAspectRatio() const

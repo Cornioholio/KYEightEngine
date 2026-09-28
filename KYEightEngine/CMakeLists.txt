@@ -53,3 +53,13 @@ add_executable(KYEightEditor ${EDITOR_SOURCES})
 target_include_directories(KYEightEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/editor/source)
 
 target_link_libraries(KYEightEditor PRIVATE KYEightEngine imgui rlimgui)
+
+
+# Game
+file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS game/source/*.cpp game/source/*.h)
+
+add_executable(KYGame ${GAME_SOURCES})
+
+target_include_directories(KYGame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/game/source)
+
+target_link_libraries(KYGame PRIVATE KYEightEngine)

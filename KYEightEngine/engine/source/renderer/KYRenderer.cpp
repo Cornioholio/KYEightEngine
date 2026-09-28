@@ -41,7 +41,6 @@ namespace KYEight
 
 		DrawGrid(20, 1.0f);
 		DrawCube({ 0.f, 1.0f, 0.f }, 2.0f, 2.0f, 2.0f, RED);
-		DrawCubeWires({ 0.f, 1.0f, 0.f }, 2.0f, 2.0f, 2.0f, BLUE);
 
 		EndMode3D();
 

@@ -23,17 +23,19 @@ namespace KYEightEditor
 		rlImGuiSetup(true);
 
 		// Set callback for the UIDrawing
-		engine.SetEditorCallback([this]()
-		{
-			DrawEditorUI();
-		});
 
 		return true;
 		
 	}
 	void KYEditor::Run() 
 	{
-		engine.Run();
+		// Editor runtime
+		while (!WindowShouldClose()) 
+		{
+			// This might change
+			engine.Render();
+			DrawEditorUI();
+		}
 	}
 	void KYEditor::Shutdown() 
 	{
@@ -44,6 +46,22 @@ namespace KYEightEditor
 
 		CloseWindow();
 	}
+
+	void KYEditor::DrawEditorUI() 
+	{
+		BeginDrawing();
+
+		ClearBackground(DARKGRAY);
+
+		rlImGuiBegin();
+
+		DrawViewport();
+
+		rlImGuiEnd();
+
+		EndDrawing();
+	}
+
 	void KYEditor::DrawViewport() 
 	{
 		ImGui::Begin("KYEight Viewport");
@@ -73,19 +91,5 @@ namespace KYEightEditor
 		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(viewportWidth, viewportHeight), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
-	}
-	void KYEditor::DrawEditorUI() 
-	{
-		BeginDrawing();
-
-		ClearBackground(DARKGRAY);
-
-		rlImGuiBegin();
-
-		DrawViewport();
-
-		rlImGuiEnd();
-
-		EndDrawing();
 	}
 }

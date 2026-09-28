@@ -1,5 +1,6 @@
 #pragma once
 #include "core/KYEngine.h"
+
 #include "rlImGui.h"
 #include "imgui.h"
 
@@ -18,7 +19,9 @@ namespace KYEightEditor
 		void DrawViewport();
 
 		KYEight::KYEngine engine;
-	
+
+		bool playing = false;
+
 		unsigned int editorWindowHeight = 1080;
 		unsigned int editorWindowWidth = 1920;
 
