@@ -8,6 +8,12 @@ namespace KYEight
 	class KYRenderer
 	{
 	public:
+		enum class RenderTarget 
+		{
+			Viewport,
+			Window
+		};
+
 		KYRenderer();
 		~KYRenderer();
 
@@ -19,13 +25,17 @@ namespace KYEight
 		KYRenderer& operator=(KYRenderer&&) = delete;
 
 		bool Initialise();
-		void RenderFrame();
+		void RenderFrame(RenderTarget target = RenderTarget::Viewport);
 		void Shutdown();
 
 		void ResizeViewport(unsigned int width, unsigned int height);
+
 		RenderTexture2D GetViewportTexture() const;
 		float GetAspectRatio() const;
+
 	private:
+		void RenderScene();
+
 		RenderTexture2D viewportTexture{};
 
 		float aspectRatio = 0.f;

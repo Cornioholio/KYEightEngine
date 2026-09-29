@@ -20,8 +20,7 @@ namespace KYEight
 		bool Initialise();
 
 		void Update();
-		void Render();
-
+		void Render(KYRenderer::RenderTarget target = KYRenderer::RenderTarget::Viewport);
 		void Shutdown();
 
 		float GetViewportAspectRatio() const;

@@ -3,7 +3,7 @@
 #include "KYPlaySession.h"
 
 #include "rlImGui.h"
-#include "imgui.h"
+#include "imgui_internal.h"
 
 namespace KYEightEditor 
 {
@@ -27,8 +27,17 @@ namespace KYEightEditor
 	private:
 		void DrawEditorUI();
 
+		void SetupDockSpace(ImGuiID dockID);
+
 		void DrawToolbar();
+
+		void DrawSceneHierarchy();
 		void DrawViewport();
+		void DrawInspector();
+		void DrawBottomPanel();
+
+		void DrawFiles();
+		void DrawConsole();
 
 		KYEight::KYEngine engine;
 		KYPlaySession playSession;

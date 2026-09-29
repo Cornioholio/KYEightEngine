@@ -30,8 +30,11 @@ namespace KYEightGame
 
 	void KYGame::RunFrame() 
 	{
-		engine.Update();
-		engine.Render();
+		while (!WindowShouldClose())
+		{
+			engine.Update();
+			engine.Render(KYEight::KYRenderer::RenderTarget::Window);
+		}
 	}
 
 	void KYGame::Shutdown() 

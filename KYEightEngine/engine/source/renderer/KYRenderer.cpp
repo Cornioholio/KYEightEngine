@@ -15,6 +15,7 @@ namespace KYEight
 	{
 		viewportTexture = LoadRenderTexture(viewportWidth, viewportHeight);
 
+		// Change to custom later on
 		aspectRatio = 16.0f / 9.0f;
 
 		if (viewportTexture.id == 0) 
@@ -31,22 +32,38 @@ namespace KYEight
 		return true;
 	}
 
-	void KYRenderer::RenderFrame()
+	void KYRenderer::RenderFrame(RenderTarget target)
 	{
-		BeginTextureMode(viewportTexture);
+		if (target == RenderTarget::Viewport) 
+		{
+			BeginTextureMode(viewportTexture);
 
-		ClearBackground(RAYWHITE);
+			ClearBackground(RAYWHITE);
 
+			RenderScene();
+
+			EndTextureMode();
+		} 
+		else  
+		{
+			BeginDrawing();
+
+			ClearBackground(RAYWHITE);
+
+			RenderScene();
+
+			EndDrawing();
+		}
+	}
+	void KYRenderer::RenderScene() 
+	{
 		BeginMode3D(camera);
 
 		DrawGrid(20, 1.0f);
 		DrawCube({ 0.f, 1.0f, 0.f }, 2.0f, 2.0f, 2.0f, RED);
 
 		EndMode3D();
-
-		EndTextureMode();
 	}
-
 	void KYRenderer::Shutdown() 
 	{
 		if (viewportTexture.id != 0) 

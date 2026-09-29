@@ -43,9 +43,9 @@ namespace KYEight
 	{
 		std::cout << "Playing!\n";
 	}
-	void KYEngine::Render() 
+	void KYEngine::Render(KYRenderer::RenderTarget target) 
 	{
-		renderer->RenderFrame();
+		renderer->RenderFrame(target);
 	}
 
 	// For editor use

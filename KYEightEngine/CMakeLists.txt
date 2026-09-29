@@ -12,7 +12,7 @@ FetchContent_Declare(raylib GIT_REPOSITORY https://github.com/raysan5/raylib.git
 FetchContent_MakeAvailable(raylib)
 
 # Dear ImGUI
-FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git GIT_TAG v1.92.7)
+FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git GIT_TAG v1.92.7-docking)
 FetchContent_MakeAvailable(imgui)
 
 add_library(imgui STATIC

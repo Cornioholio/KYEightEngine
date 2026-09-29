@@ -31,6 +31,11 @@ namespace KYEightEditor
 		// Start setup for raylib <=> imgui connection
 		rlImGuiSetup(true);
 
+		// Allow docking
+		ImGuiIO& io = ImGui::GetIO();
+
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 		// Set callback for the UIDrawing
 
 		return true;
@@ -69,17 +74,89 @@ namespace KYEightEditor
 
 		rlImGuiBegin();
 
-		DrawViewport();
 		DrawToolbar();
+
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		ImGui::SetNextWindowPos(viewport->WorkPos);
+		ImGui::SetNextWindowSize(viewport->WorkSize);
+		ImGui::SetNextWindowViewport(viewport->ID);
+
+		ImGuiWindowFlags dockFlags =
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus |
+			ImGuiWindowFlags_NoBackground;
+
+		ImGui::Begin("KYEight Editorm", nullptr, dockFlags);
+
+		ImGuiID dockID = ImGui::GetID("KYEightDockSpace");
+
+		ImGui::DockSpace(dockID, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_None);
+
+		SetupDockSpace(dockID);
+
+		ImGui::End();
+
+		DrawSceneHierarchy();
+		DrawViewport();
+		DrawInspector();
+		DrawBottomPanel();
 
 		rlImGuiEnd();
 
 		EndDrawing();
 	}
 
+	void KYEditor::SetupDockSpace(ImGuiID dockID) 
+	{
+		static bool layoutBuilt = false;
+
+		if (layoutBuilt) 
+		{
+			return;
+		}
+
+		layoutBuilt = true;
+
+		ImGui::DockBuilderRemoveNode(dockID);
+
+		ImGui::DockBuilderAddNode(dockID, ImGuiDockNodeFlags_DockSpace);
+
+		ImGui::DockBuilderSetNodeSize(dockID, ImGui::GetMainViewport()->WorkSize);
+
+		ImGuiID dockMain = dockID;
+
+		// Left panel
+		ImGuiID dockLeft;
+
+		ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Left, 0.2f, &dockLeft, &dockMain);
+
+		// Right panel
+		ImGuiID dockRight;
+
+		ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Right, 0.2f, &dockRight, &dockMain);
+
+		// Bottom panel
+		ImGuiID dockBottom;
+
+		ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Down, 0.2f, &dockBottom, &dockMain);
+
+		// Assign all windows
+		ImGui::DockBuilderDockWindow("Objects", dockLeft);
+		ImGui::DockBuilderDockWindow("Viewport", dockMain);
+		ImGui::DockBuilderDockWindow("Inspector", dockRight);
+		ImGui::DockBuilderDockWindow("File Explorer", dockBottom);
+
+		ImGui::DockBuilderFinish(dockID);
+	}
+
 	void KYEditor::DrawViewport() 
 	{
-		ImGui::Begin("KYEight Viewport");
+		ImGui::Begin("Viewport");
 
 		// Real time resizing letterboxing, based on aspect ratio.
 		ImVec2 availableSize = ImGui::GetContentRegionAvail();
@@ -109,6 +186,14 @@ namespace KYEightEditor
 	}
 	void KYEditor::DrawToolbar() 
 	{
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
+
+		ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
+
+		ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), 45.f), ImGuiCond_Always);
+
+		ImGui::Begin("Toolbar", nullptr, flags);
+
 		if (!playSession.isPlaying()) 
 		{
 			if (ImGui::Button("Play")) 
@@ -123,5 +208,68 @@ namespace KYEightEditor
 				playSession.Stop(engine);
 			}
 		}
+
+		ImGui::SameLine();
+
+		ImGui::Button("Pause");
+
+		ImGui::SameLine();
+
+		ImGui::Button("Step");
+
+		ImGui::End();
+	}
+	void KYEditor::DrawSceneHierarchy() 
+	{
+		ImGui::Begin("Objects");
+
+		ImGui::Text("Scene");
+
+		ImGui::Separator();
+
+		ImGui::Text("Player");
+		ImGui::Text("Cube");
+		ImGui::Text("Camera");
+
+		ImGui::End();
+	}
+	void KYEditor::DrawInspector() 
+	{
+		ImGui::Begin("Inspector");
+
+		ImGui::TextDisabled("Select an Entity or actor");
+
+		ImGui::End();
+	}
+	void KYEditor::DrawBottomPanel() 
+	{
+		ImGui::Begin("Bottom Panel");
+
+		if (ImGui::BeginTabBar("BottomPanelTabs")) 
+		{
+			if (ImGui::BeginTabItem("Files")) 
+			{
+				DrawFiles();
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Console")) 
+			{
+				DrawConsole();
+
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+
+		ImGui::End();
+	}
+	void KYEditor::DrawFiles() 
+	{
+	
+	}
+	void KYEditor::DrawConsole() 
+	{
+		
 	}
 }

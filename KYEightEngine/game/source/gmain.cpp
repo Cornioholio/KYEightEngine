@@ -9,10 +9,7 @@ int main()
 		return -1;
 	}
 
-	while (!WindowShouldClose()) 
-	{
-		game.RunFrame();
-	}
+	game.RunFrame();
 
 	game.Shutdown();
 
