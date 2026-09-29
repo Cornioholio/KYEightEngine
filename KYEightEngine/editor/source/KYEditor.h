@@ -10,7 +10,7 @@ namespace KYEightEditor
 	class KYEditor 
 	{
 	public:
-		KYEditor();
+		KYEditor(KYEight::KYRenderer::RenderTarget target);
 		~KYEditor();
 
 		// Disable copy and move semantics
@@ -39,7 +39,8 @@ namespace KYEightEditor
 		void DrawFiles();
 		void DrawConsole();
 
-		KYEight::KYEngine engine;
+		KYEight::KYEngine* engine;
+
 		KYPlaySession playSession;
 
 		// Editor window

@@ -6,7 +6,7 @@ namespace KYEightGame
 	class KYGame 
 	{
 	public:
-		KYGame();
+		KYGame() = default;
 		~KYGame();
 
 		KYGame(KYGame&) = delete;

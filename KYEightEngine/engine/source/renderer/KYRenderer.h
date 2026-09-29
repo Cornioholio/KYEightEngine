@@ -3,18 +3,22 @@
 
 #include <iostream>
 
+/// <summary>
+/// Renderer class responsible for managing rendering frames for viewport texture in editor, or in game executable.
+/// </summary>
 namespace KYEight 
 {
 	class KYRenderer
 	{
 	public:
+		// Targets to determine what to render (game & editor)
 		enum class RenderTarget 
 		{
 			Viewport,
 			Window
 		};
 
-		KYRenderer();
+		KYRenderer(RenderTarget target);
 		~KYRenderer();
 
 		// Disable move and copy semantics
@@ -25,7 +29,7 @@ namespace KYEight
 		KYRenderer& operator=(KYRenderer&&) = delete;
 
 		bool Initialise();
-		void RenderFrame(RenderTarget target = RenderTarget::Viewport);
+		void RenderFrame();
 		void Shutdown();
 
 		void ResizeViewport(unsigned int width, unsigned int height);
@@ -35,6 +39,8 @@ namespace KYEight
 
 	private:
 		void RenderScene();
+
+		RenderTarget renderTarget{};
 
 		RenderTexture2D viewportTexture{};
 

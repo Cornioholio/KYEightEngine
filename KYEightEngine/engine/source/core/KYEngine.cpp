@@ -2,20 +2,19 @@
 
 namespace KYEight 
 {
-	KYEngine::KYEngine() 
+	// Create and dispose of systems here
+	KYEngine::KYEngine(KYRenderer::RenderTarget target) 
 	{
-		renderer = new KYRenderer();
+		renderer = new KYRenderer(target);
 	}
 	KYEngine::~KYEngine() 
 	{
 		delete renderer;
 		renderer = nullptr;
 	}
-
-
 	bool KYEngine::Initialise() 
 	{
-		// Initialize systems
+		// Make sure renderer exists and initialises
 		if (renderer == nullptr) 
 		{
 			std::cout << "[ENGINE] No instance of renderer exists, could not intiailize renderer\n";
@@ -31,7 +30,7 @@ namespace KYEight
 	}
 	void KYEngine::Shutdown() 
 	{
-		// Shut down systems
+		// Renderer should exist to dispose
 		if (renderer == nullptr) 
 		{
 			std::cout << "[ENGINE] No instance of renderer exists, could not shut renderer down\n";
@@ -39,16 +38,18 @@ namespace KYEight
 
 		renderer->Shutdown();
 	}
+
+	// Main game loop.
 	void KYEngine::Update() 
 	{
 		std::cout << "Playing!\n";
 	}
-	void KYEngine::Render(KYRenderer::RenderTarget target) 
+	void KYEngine::Render() 
 	{
-		renderer->RenderFrame(target);
+		renderer->RenderFrame();
 	}
 
-	// For editor use
+	// For editor use.
 	float KYEngine::GetViewportAspectRatio() const
 	{
 		return renderer->GetAspectRatio();

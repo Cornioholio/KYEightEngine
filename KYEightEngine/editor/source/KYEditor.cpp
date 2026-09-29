@@ -2,13 +2,14 @@
 
 namespace KYEightEditor 
 {
-	KYEditor::KYEditor() 
+	KYEditor::KYEditor(KYEight::KYRenderer::RenderTarget target) 
 	{
-	
+		engine = new KYEight::KYEngine(target);
 	}
 	KYEditor::~KYEditor() 
 	{
-		
+		delete engine;
+		engine = nullptr;
 	}
 
 	bool KYEditor::Initialise() 
@@ -23,7 +24,7 @@ namespace KYEightEditor
 		{
 			return false;
 		}
-		if (!engine.Initialise()) 
+		if (!engine->Initialise()) 
 		{
 			return false;
 		}
@@ -47,9 +48,9 @@ namespace KYEightEditor
 		while (!WindowShouldClose()) 
 		{
 			// Play session only updates when play is pressed, engine & ui rendering always happens 
-			playSession.Update(engine);
+			playSession.Update(*engine);
 
-			engine.Render();
+			engine->Render();
 
 			DrawEditorUI();
 		}
@@ -57,11 +58,11 @@ namespace KYEightEditor
 	void KYEditor::Shutdown() 
 	{
 		// Shutdown editor and clean up
-		playSession.Stop(engine);
+		playSession.Stop(*engine);
 
 		rlImGuiShutdown();
 
-		engine.Shutdown();
+		engine->Shutdown();
 
 		CloseWindow();
 	}
@@ -162,13 +163,13 @@ namespace KYEightEditor
 		ImVec2 availableSize = ImGui::GetContentRegionAvail();
 
 		float viewportWidth = availableSize.x;
-		float viewportHeight = viewportWidth / engine.GetViewportAspectRatio();
+		float viewportHeight = viewportWidth / engine->GetViewportAspectRatio();
 
 		// If calculated height is too large, constrain by height instead
 		if (viewportHeight > availableSize.y) 
 		{
 			viewportHeight = availableSize.y;
-			viewportWidth = viewportHeight * engine.GetViewportAspectRatio();
+			viewportWidth = viewportHeight * engine->GetViewportAspectRatio();
 		}
 
 		ImVec2 dockMiddle = ImGui::GetCursorPos();
@@ -178,7 +179,7 @@ namespace KYEightEditor
 
 		ImGui::SetCursorPos(dockMiddle);
 		
-		RenderTexture2D viewport = engine.GetViewportTexture();
+		RenderTexture2D viewport = engine->GetViewportTexture();
 
 		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(viewportWidth, viewportHeight), ImVec2(0, 1), ImVec2(1, 0));
 
@@ -198,14 +199,14 @@ namespace KYEightEditor
 		{
 			if (ImGui::Button("Play")) 
 			{
-				playSession.Start(engine);
+				playSession.Start(*engine);
 			}
 		}
 		else 
 		{
 			if (ImGui::Button("Stop")) 
 			{
-				playSession.Stop(engine);
+				playSession.Stop(*engine);
 			}
 		}
 

@@ -2,12 +2,16 @@
 #include "renderer/KYRenderer.h"
 
 #include <iostream>
+
+/// <summary>
+/// KYEngine encapsulates all core game systems and provides the game loop (update, render and input).
+/// </summary>
 namespace KYEight
 {
 	class KYEngine
 	{
 	public:
-		KYEngine();
+		KYEngine(KYRenderer::RenderTarget target);
 		~KYEngine();
 
 		// Disable move and copy semantics
@@ -17,16 +21,22 @@ namespace KYEight
 		KYEngine(KYEngine&&) = delete;
 		KYEngine& operator=(KYEngine&&) = delete;
 
+		// Sets up all game systems (render, input etc.)
 		bool Initialise();
 
+		// Update game logic.
 		void Update();
-		void Render(KYRenderer::RenderTarget target = KYRenderer::RenderTarget::Viewport);
+		// Render game graphics, either viewport or game (Render target dependent).
+		void Render();
+		// Clean up 
 		void Shutdown();
 
+		// Getters for editor use.
 		float GetViewportAspectRatio() const;
 		RenderTexture2D GetViewportTexture() const;
 	private:
-
+		// Systems
 		KYRenderer* renderer;
+
 	};
 }

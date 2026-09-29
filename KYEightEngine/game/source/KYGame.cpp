@@ -2,10 +2,7 @@
 
 namespace KYEightGame 
 {
-	KYGame::KYGame() 
-	{
 
-	}
 	KYGame::~KYGame() 
 	{
 
@@ -33,7 +30,7 @@ namespace KYEightGame
 		while (!WindowShouldClose())
 		{
 			engine.Update();
-			engine.Render(KYEight::KYRenderer::RenderTarget::Window);
+			engine.Render();
 		}
 	}
 

@@ -2,7 +2,7 @@
 
 namespace KYEight 
 {
-	KYRenderer::KYRenderer() 
+	KYRenderer::KYRenderer(RenderTarget target) : renderTarget(target)
 	{
 		
 	}
@@ -13,16 +13,19 @@ namespace KYEight
 
 	bool KYRenderer::Initialise() 
 	{
+		// Set initial dimensions for viewport texture.
 		viewportTexture = LoadRenderTexture(viewportWidth, viewportHeight);
 
-		// Change to custom later on
+		// To keep window of a certain aspect ratio no matter viewport or window size, change to custom later on.
 		aspectRatio = 16.0f / 9.0f;
 
+		// Dont initialise if the viewport texture doesnt exist.
 		if (viewportTexture.id == 0) 
 		{
 			return false;
 		}
 
+		// Set inital camera settings (temporary)
 		camera.position = { 5.0f, 5.0f, 5.0f };
 		camera.target = { 0.f, 0.f, 0.f };
 		camera.up = { 0.f, 1.0f, 0.f };
@@ -32,9 +35,10 @@ namespace KYEight
 		return true;
 	}
 
-	void KYRenderer::RenderFrame(RenderTarget target)
+	void KYRenderer::RenderFrame()
 	{
-		if (target == RenderTarget::Viewport) 
+		// If the target is for a viewport
+		if (renderTarget == RenderTarget::Viewport) 
 		{
 			BeginTextureMode(viewportTexture);
 
@@ -46,6 +50,7 @@ namespace KYEight
 		} 
 		else  
 		{
+			// If the target is a window
 			BeginDrawing();
 
 			ClearBackground(RAYWHITE);
@@ -55,6 +60,7 @@ namespace KYEight
 			EndDrawing();
 		}
 	}
+	// Render 3D game scene 
 	void KYRenderer::RenderScene() 
 	{
 		BeginMode3D(camera);
@@ -64,6 +70,7 @@ namespace KYEight
 
 		EndMode3D();
 	}
+	// Dispose of viewport texture 
 	void KYRenderer::Shutdown() 
 	{
 		if (viewportTexture.id != 0) 
