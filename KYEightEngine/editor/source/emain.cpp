@@ -3,7 +3,8 @@
 // Game editor entry point
 int main() 
 {
-	KYEightEditor::KYEditor editor(KYEight::KYRenderer::RenderTarget::Viewport);
+
+	KYEightEditor::KYEditor editor;
 
 	if (!editor.Initialise()) 
 	{

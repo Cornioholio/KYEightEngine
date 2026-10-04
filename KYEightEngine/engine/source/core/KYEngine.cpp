@@ -3,7 +3,7 @@
 namespace KYEight 
 {
 	// Create and dispose of systems here
-	KYEngine::KYEngine(KYRenderer::RenderTarget target) 
+	KYEngine::KYEngine(RenderTarget& target) 
 	{
 		renderer = new KYRenderer(target);
 	}

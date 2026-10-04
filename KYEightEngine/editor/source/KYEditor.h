@@ -1,6 +1,8 @@
 #pragma once
 #include "core/KYEngine.h"
-#include "KYPlaySession.h"
+#include "renderer/ViewportTarget.h"
+
+#include "PlaySession.h"
 
 #include "rlImGui.h"
 #include "imgui_internal.h"
@@ -10,7 +12,7 @@ namespace KYEightEditor
 	class KYEditor 
 	{
 	public:
-		KYEditor(KYEight::KYRenderer::RenderTarget target);
+		KYEditor();
 		~KYEditor();
 
 		// Disable copy and move semantics
@@ -39,15 +41,17 @@ namespace KYEightEditor
 		void DrawFiles();
 		void DrawConsole();
 
-		KYEight::KYEngine* engine;
+		KYEight::ViewportTarget viewportTarget_;
 
-		KYPlaySession playSession;
+		KYEight::KYEngine* engine_ = nullptr;
+
+		PlaySession playSession_;
 
 		// Editor window
-		unsigned int editorWindowHeight = 1080;
-		unsigned int editorWindowWidth = 1920;
+		unsigned int editorWindowHeight_ = 1080;
+		unsigned int editorWindowWidth_ = 1920;
 
-		const char* editorWindowTitle = "She's turned the weans against us";
+		const char* editorWindowTitle_ = "Choaklit creem";
 
 	};
 }

@@ -11,7 +11,7 @@ namespace KYEight
 	class KYEngine
 	{
 	public:
-		KYEngine(KYRenderer::RenderTarget target);
+		KYEngine(RenderTarget& target);
 		~KYEngine();
 
 		// Disable move and copy semantics
@@ -36,7 +36,7 @@ namespace KYEight
 		RenderTexture2D GetViewportTexture() const;
 	private:
 		// Systems
-		KYRenderer* renderer;
+		KYRenderer* renderer = nullptr;
 
 	};
 }

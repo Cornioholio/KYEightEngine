@@ -1,34 +1,34 @@
 #include "KYEditor.h"
 
-namespace KYEightEditor 
+namespace KYEightEditor
 {
-	KYEditor::KYEditor(KYEight::KYRenderer::RenderTarget target) 
+	KYEditor::KYEditor() : viewportTarget_(1280, 720)
 	{
-		engine = new KYEight::KYEngine(target);
+		engine_ = new KYEight::KYEngine(viewportTarget_);
 	}
-	KYEditor::~KYEditor() 
+	KYEditor::~KYEditor()
 	{
-		delete engine;
-		engine = nullptr;
+		delete engine_;
+		engine_ = nullptr;
 	}
 
-	bool KYEditor::Initialise() 
+	bool KYEditor::Initialise()
 	{
 		// Set editor window properties, resizable and vsync 
 		SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-		InitWindow(editorWindowWidth, editorWindowHeight, editorWindowTitle);
+		InitWindow(editorWindowWidth_, editorWindowHeight_, editorWindowTitle_);
 		MaximizeWindow();
 
 		// Dont allow initialisation if window or engine arent both ready
-		if (!IsWindowReady()) 
+		if (!IsWindowReady())
 		{
 			return false;
 		}
-		if (!engine->Initialise()) 
+		if (!engine_->Initialise())
 		{
 			return false;
 		}
-		
+
 		// Start setup for raylib <=> imgui connection
 		rlImGuiSetup(true);
 
@@ -40,34 +40,34 @@ namespace KYEightEditor
 		// Set callback for the UIDrawing
 
 		return true;
-		
+
 	}
-	void KYEditor::Run() 
+	void KYEditor::Run()
 	{
 		// Editor runtime
-		while (!WindowShouldClose()) 
+		while (!WindowShouldClose())
 		{
 			// Play session only updates when play is pressed, engine & ui rendering always happens 
-			playSession.Update(*engine);
+			playSession_.Update(*engine_);
 
-			engine->Render();
+			engine_->Render();
 
 			DrawEditorUI();
 		}
 	}
-	void KYEditor::Shutdown() 
+	void KYEditor::Shutdown()
 	{
 		// Shutdown editor and clean up
-		playSession.Stop(*engine);
+		playSession_.Stop(*engine_);
 
 		rlImGuiShutdown();
 
-		engine->Shutdown();
+		engine_->Shutdown();
 
 		CloseWindow();
 	}
 
-	void KYEditor::DrawEditorUI() 
+	void KYEditor::DrawEditorUI()
 	{
 		BeginDrawing();
 
@@ -112,11 +112,11 @@ namespace KYEightEditor
 		EndDrawing();
 	}
 
-	void KYEditor::SetupDockSpace(ImGuiID dockID) 
+	void KYEditor::SetupDockSpace(ImGuiID dockID)
 	{
 		static bool layoutBuilt = false;
 
-		if (layoutBuilt) 
+		if (layoutBuilt)
 		{
 			return;
 		}
@@ -155,7 +155,7 @@ namespace KYEightEditor
 		ImGui::DockBuilderFinish(dockID);
 	}
 
-	void KYEditor::DrawViewport() 
+	void KYEditor::DrawViewport()
 	{
 		ImGui::Begin("Viewport");
 
@@ -163,13 +163,13 @@ namespace KYEightEditor
 		ImVec2 availableSize = ImGui::GetContentRegionAvail();
 
 		float viewportWidth = availableSize.x;
-		float viewportHeight = viewportWidth / engine->GetViewportAspectRatio();
+		float viewportHeight = viewportWidth / engine_->GetViewportAspectRatio();
 
 		// If calculated height is too large, constrain by height instead
-		if (viewportHeight > availableSize.y) 
+		if (viewportHeight > availableSize.y)
 		{
 			viewportHeight = availableSize.y;
-			viewportWidth = viewportHeight * engine->GetViewportAspectRatio();
+			viewportWidth = viewportHeight * engine_->GetViewportAspectRatio();
 		}
 
 		ImVec2 dockMiddle = ImGui::GetCursorPos();
@@ -178,14 +178,14 @@ namespace KYEightEditor
 		dockMiddle.y += (availableSize.y - viewportHeight) * 0.5f;
 
 		ImGui::SetCursorPos(dockMiddle);
-		
-		RenderTexture2D viewport = engine->GetViewportTexture();
+
+		RenderTexture2D viewport = engine_->GetViewportTexture();
 
 		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(viewportWidth, viewportHeight), ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 	}
-	void KYEditor::DrawToolbar() 
+	void KYEditor::DrawToolbar()
 	{
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
 
@@ -195,18 +195,18 @@ namespace KYEightEditor
 
 		ImGui::Begin("Toolbar", nullptr, flags);
 
-		if (!playSession.isPlaying()) 
+		if (!playSession_.isPlaying())
 		{
-			if (ImGui::Button("Play")) 
+			if (ImGui::Button("Play"))
 			{
-				playSession.Start(*engine);
+				playSession_.Start(*engine_);
 			}
 		}
-		else 
+		else
 		{
-			if (ImGui::Button("Stop")) 
+			if (ImGui::Button("Stop"))
 			{
-				playSession.Stop(*engine);
+				playSession_.Stop(*engine_);
 			}
 		}
 
@@ -220,7 +220,7 @@ namespace KYEightEditor
 
 		ImGui::End();
 	}
-	void KYEditor::DrawSceneHierarchy() 
+	void KYEditor::DrawSceneHierarchy()
 	{
 		ImGui::Begin("Objects");
 
@@ -234,7 +234,7 @@ namespace KYEightEditor
 
 		ImGui::End();
 	}
-	void KYEditor::DrawInspector() 
+	void KYEditor::DrawInspector()
 	{
 		ImGui::Begin("Inspector");
 
@@ -242,18 +242,18 @@ namespace KYEightEditor
 
 		ImGui::End();
 	}
-	void KYEditor::DrawBottomPanel() 
+	void KYEditor::DrawBottomPanel()
 	{
 		ImGui::Begin("Bottom Panel");
 
-		if (ImGui::BeginTabBar("BottomPanelTabs")) 
+		if (ImGui::BeginTabBar("BottomPanelTabs"))
 		{
-			if (ImGui::BeginTabItem("Files")) 
+			if (ImGui::BeginTabItem("Files"))
 			{
 				DrawFiles();
 				ImGui::EndTabItem();
 			}
-			if (ImGui::BeginTabItem("Console")) 
+			if (ImGui::BeginTabItem("Console"))
 			{
 				DrawConsole();
 
@@ -265,12 +265,12 @@ namespace KYEightEditor
 
 		ImGui::End();
 	}
-	void KYEditor::DrawFiles() 
+	void KYEditor::DrawFiles()
 	{
-	
+
 	}
-	void KYEditor::DrawConsole() 
+	void KYEditor::DrawConsole()
 	{
-		
+
 	}
 }

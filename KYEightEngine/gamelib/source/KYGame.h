@@ -1,12 +1,13 @@
 #pragma once
 #include "core/KYEngine.h"
+#include "renderer/WindowTarget.h"	
 
 namespace KYEightGame 
 {
 	class KYGame 
 	{
 	public:
-		KYGame() = default;
+		KYGame();
 		~KYGame();
 
 		KYGame(KYGame&) = delete;
@@ -22,7 +23,9 @@ namespace KYEightGame
 		void Shutdown();
 
 	private:
-		KYEight::KYEngine engine;
+		KYEight::WindowTarget windowTarget;
+
+		KYEight::KYEngine* engine = nullptr;
 	
 	};
 }

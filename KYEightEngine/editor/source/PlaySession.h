@@ -3,18 +3,18 @@
 
 namespace KYEightEditor
 {
-	class KYPlaySession
+	class PlaySession
 	{
 	public:
-		KYPlaySession() = default;
-		~KYPlaySession() = default;
+		PlaySession() = default;
+		~PlaySession() = default;
 
 		// Disable copy/move
-		KYPlaySession(const KYPlaySession&) = delete;
-		KYPlaySession& operator=(const KYPlaySession&) = delete;
+		PlaySession(const PlaySession&) = delete;
+		PlaySession& operator=(const PlaySession&) = delete;
 
-		KYPlaySession(KYPlaySession&&) = delete;
-		KYPlaySession& operator=(KYPlaySession&&) = delete;
+		PlaySession(PlaySession&&) = delete;
+		PlaySession& operator=(PlaySession&&) = delete;
 
 		bool Start(KYEight::KYEngine& engine);
 		void Update(KYEight::KYEngine& engine);

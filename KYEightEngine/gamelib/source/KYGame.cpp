@@ -2,10 +2,14 @@
 
 namespace KYEightGame 
 {
-
+	KYGame::KYGame() 
+	{
+		engine = new KYEight::KYEngine(windowTarget);
+	}
 	KYGame::~KYGame() 
 	{
-
+		delete engine;
+		engine = nullptr;
 	}
 
 	bool KYGame::Initialise()
@@ -17,7 +21,7 @@ namespace KYEightGame
 		{
 			return false;
 		}
-		if (!engine.Initialise()) 
+		if (!engine->Initialise()) 
 		{
 			return false;
 		}
@@ -29,14 +33,14 @@ namespace KYEightGame
 	{
 		while (!WindowShouldClose())
 		{
-			engine.Update();
-			engine.Render();
+			engine->Update();
+			engine->Render();
 		}
 	}
 
 	void KYGame::Shutdown() 
 	{
-		engine.Shutdown();
+		engine->Shutdown();
 		CloseWindow();
 	}
 }

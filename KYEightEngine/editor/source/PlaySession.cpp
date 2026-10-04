@@ -1,9 +1,9 @@
-#include "KYPlaySession.h"
+#include "PlaySession.h"
 
 namespace KYEightEditor
 {
 
-	bool KYPlaySession::Start(KYEight::KYEngine& engine) 
+	bool PlaySession::Start(KYEight::KYEngine& engine)
 	{
 		if (playing) 
 		{
@@ -14,7 +14,7 @@ namespace KYEightEditor
 
 		return true;
 	}
-	void KYPlaySession::Update(KYEight::KYEngine& engine) 
+	void PlaySession::Update(KYEight::KYEngine& engine)
 	{
 		if (!playing) 
 		{
@@ -23,7 +23,7 @@ namespace KYEightEditor
 
 		engine.Update();
 	}
-	bool KYPlaySession::Stop(KYEight::KYEngine& engine) 
+	bool PlaySession::Stop(KYEight::KYEngine& engine)
 	{
 		if (!playing) 
 		{
@@ -34,7 +34,7 @@ namespace KYEightEditor
 
 	}
 
-	bool KYPlaySession::isPlaying() const 
+	bool PlaySession::isPlaying() const
 	{
 		return playing;
 	}

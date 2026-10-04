@@ -3,7 +3,6 @@
 // Game entry point
 int main() 
 {
-	/*
 	KYEightGame::KYGame game;
 
 	if (!game.Initialise()) 
@@ -17,5 +16,4 @@ int main()
 	game.Shutdown();
 
 	return 0;
-	*/
 }
