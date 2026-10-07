@@ -6,7 +6,7 @@
 // Entities
 #include "ecs/Registry.h"
 #include "ecs/components/CoreComponents.h"
-
+#include "ecs/Entity.h"
 
 #include "rlImGui.h"
 #include "imgui_internal.h"
@@ -37,6 +37,7 @@ namespace KYEightEditor
 
 		void DrawToolbar();
 
+		// UI Windows
 		void DrawSceneHierarchy();
 		void DrawViewport();
 		void DrawInspector();
@@ -44,11 +45,15 @@ namespace KYEightEditor
 
 		void DrawFiles();
 		void DrawConsole();
+		
+		// Inspector entity properties
+		void DrawTransforms(KYEight::Entity entity);
+
+
+		KYEight::Entity selectedEntity_ = KYEight::NullEntity;
 
 		KYEight::ViewportTarget viewportTarget_;
-
 		KYEight::KYEngine* engine_ = nullptr;
-
 		PlaySession playSession_;
 
 		// Editor window

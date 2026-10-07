@@ -73,7 +73,8 @@ namespace KYEight
 		T& GetComponent(Entity entity)
 		{
 			// Get the storage for T, then find entity inside storage
-			return GetComponentStorage<T>().at(entity);
+			
+			return GetComponentStorage<T>().components.at(entity);
 		}
 		template<typename T>
 		const T& GetComponent(Entity entity) const

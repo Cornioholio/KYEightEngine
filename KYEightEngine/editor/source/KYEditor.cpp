@@ -252,7 +252,12 @@ namespace KYEightEditor
 
 			const KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(entity);
 
-			ImGui::Text("%s", name.name_.c_str());
+			bool selected = (selectedEntity_ == entity);
+
+			if (ImGui::Selectable(name.name_.c_str(), selectedEntity_)) 
+			{
+				selectedEntity_ = entity;
+			}
 		}
 
 		ImGui::End();
@@ -261,9 +266,40 @@ namespace KYEightEditor
 	{
 		ImGui::Begin("Inspector");
 
-		ImGui::TextDisabled("Select an Entity or actor");
+		KYEight::Registry& registry = engine_->GetRegistry();
+
+		if (selectedEntity_ == KYEight::NullEntity) 
+		{
+			ImGui::Text("No entity selected");
+			ImGui::End();
+			return;
+		}
+
+		// Draw entity properties
+		DrawTransforms(selectedEntity_);
 
 		ImGui::End();
+	}
+	void KYEditor::DrawTransforms(KYEight::Entity entity) 
+	{
+		KYEight::Registry& registry = engine_->GetRegistry();
+
+		if (!registry.HasComponent<KYEight::Transform3D>(entity))
+		{
+			return;
+		}
+
+		KYEight::Transform3D& transform = registry.GetComponent<KYEight::Transform3D>(entity);
+
+		if (!ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			return;
+		}
+
+		ImGui::DragFloat3("Position", &transform.position_.x, 0.1f);
+		ImGui::DragFloat3("Rotation", &transform.rotation_.x, 0.1f);
+		ImGui::DragFloat3("Scale", &transform.scale_.x, 0.1f);
+
 	}
 	void KYEditor::DrawBottomPanel()
 	{
