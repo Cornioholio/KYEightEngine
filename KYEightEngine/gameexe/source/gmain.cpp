@@ -11,7 +11,7 @@ int main()
 	}
 
 	// Game loop
-	game.RunFrame();
+	game.Run();
 
 	game.Shutdown();
 

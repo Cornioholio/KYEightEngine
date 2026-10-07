@@ -64,10 +64,10 @@ target_include_directories(KYGameLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gamelib/
 target_link_libraries(KYGameLib PUBLIC KYEightEngine)
 
 # Game
-file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS game/source/*.cpp game/source/*.h)
+file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS gameexe/source/*.cpp gameexe/source/*.h)
 
 add_executable(KYGame ${GAME_SOURCES})
 
-target_include_directories(KYGame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/game/source)
+target_include_directories(KYGame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/gameexe/source)
 
 target_link_libraries(KYGame PRIVATE KYGameLib)

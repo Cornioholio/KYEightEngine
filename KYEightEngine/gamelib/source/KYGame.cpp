@@ -29,7 +29,7 @@ namespace KYEightGame
 		return true;
 	}
 
-	void KYGame::RunFrame() 
+	void KYGame::Run()
 	{
 		while (!WindowShouldClose())
 		{

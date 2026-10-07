@@ -3,7 +3,6 @@
 // Game editor entry point
 int main() 
 {
-
 	KYEightEditor::KYEditor editor;
 
 	if (!editor.Initialise()) 

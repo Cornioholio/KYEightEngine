@@ -8,6 +8,7 @@ namespace KYEight
 	}
 	ViewportTarget::~ViewportTarget() 
 	{
+		// Clean up resources
 		Shutdown();
 	}
 	bool ViewportTarget::Initialise() 
@@ -24,6 +25,7 @@ namespace KYEight
 	}
 	void ViewportTarget::Begin()  
 	{
+		// Start rendering via viewport texture
 		BeginTextureMode(viewportTexture_);
 	}
 	void ViewportTarget::End()  

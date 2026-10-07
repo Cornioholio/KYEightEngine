@@ -79,9 +79,20 @@ namespace KYEightEditor
 
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-		ImGui::SetNextWindowPos(viewport->WorkPos);
-		ImGui::SetNextWindowSize(viewport->WorkSize);
+		
+		ImVec2 dockSpacePos = viewport->WorkPos;
+		dockSpacePos.y += 45.f;
+
+		ImVec2 dockSpaceSize = viewport->WorkSize;
+		dockSpaceSize.y -= 45.f;
+		
+
+		ImGui::SetNextWindowPos(dockSpacePos);
+		ImGui::SetNextWindowSize(dockSpaceSize);
 		ImGui::SetNextWindowViewport(viewport->ID);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 		ImGuiWindowFlags dockFlags =
 			ImGuiWindowFlags_NoTitleBar |
@@ -93,6 +104,8 @@ namespace KYEightEditor
 			ImGuiWindowFlags_NoBackground;
 
 		ImGui::Begin("KYEight Editorm", nullptr, dockFlags);
+
+		ImGui::PopStyleVar(2);
 
 		ImGuiID dockID = ImGui::GetID("KYEightDockSpace");
 
@@ -187,13 +200,13 @@ namespace KYEightEditor
 	}
 	void KYEditor::DrawToolbar()
 	{
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar;
+		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
 		ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
 
 		ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), 45.f), ImGuiCond_Always);
 
-		ImGui::Begin("Toolbar", nullptr, flags);
+		ImGui::Begin("Tool Bar", nullptr, flags);
 
 		if (!playSession_.isPlaying())
 		{
@@ -244,7 +257,7 @@ namespace KYEightEditor
 	}
 	void KYEditor::DrawBottomPanel()
 	{
-		ImGui::Begin("Bottom Panel");
+		ImGui::Begin("File Explorer");
 
 		if (ImGui::BeginTabBar("BottomPanelTabs"))
 		{
