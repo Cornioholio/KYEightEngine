@@ -6,6 +6,7 @@ namespace KYEight
 	KYEngine::KYEngine(RenderTarget& target) 
 	{
 		renderer = new KYRenderer(target);
+
 	}
 	KYEngine::~KYEngine() 
 	{
@@ -25,6 +26,14 @@ namespace KYEight
 			std::cout << "[ENGINE} Failed to intialize renderer\n";
 			return false;
 		}
+		
+		// Temporary entity test
+		Entity cubeEntity = registry_.CreateEntity();
+
+		registry_.AddComponent<NameComponent>(cubeEntity, "Shes turned the weans against us");
+		registry_.AddComponent<Transform3D>(cubeEntity);
+		registry_.AddComponent<MeshComponent>(cubeEntity);
+
 		return true;
 
 	}
@@ -43,13 +52,28 @@ namespace KYEight
 	void KYEngine::Update() 
 	{
 		std::cout << "Playing!\n";
+
+		// ECS Update, Timer Tick, Update function for all user scripts.
 	}
 	void KYEngine::Render() 
 	{
-		renderer->RenderFrame();
+		renderer->BeginFrame();
+
+		meshSystem_.Render(registry_, renderer->GetCamera());
+
+		renderer->EndFrame();
+
 	}
 
 	// For editor use.
+	Registry& KYEngine::GetRegistry() 
+	{
+		return registry_;
+	}
+	const Registry& KYEngine::GetRegistry() const 
+	{
+		return registry_;
+	}
 	float KYEngine::GetViewportAspectRatio() const
 	{
 		return renderer->GetAspectRatio();

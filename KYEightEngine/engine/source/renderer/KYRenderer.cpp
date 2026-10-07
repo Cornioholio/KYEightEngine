@@ -28,32 +28,26 @@ namespace KYEight
 
 		return true;
 	}
-
-	void KYRenderer::RenderFrame()
+	void KYRenderer::BeginFrame() 
 	{
 		renderTarget_.Begin();
 
 		ClearBackground(RAYWHITE);
-
-		RenderScene();
-
-		renderTarget_.End();
 	}
-	// Render 3D game scene 
-	void KYRenderer::RenderScene() 
+	void KYRenderer::EndFrame() 
 	{
-		BeginMode3D(camera_);
-
-		DrawGrid(20, 1.0f);
-		DrawCube({ 0.f, 1.0f, 0.f }, 2.0f, 2.0f, 2.0f, RED);
-
-		EndMode3D();
+		renderTarget_.End();
 	}
 
 	void KYRenderer::Shutdown() 
 	{
 		renderTarget_.Shutdown();
 	}	
+
+	const Camera3D& KYRenderer::GetCamera() const 
+	{
+		return camera_;
+	}
 
 	float KYRenderer::GetAspectRatio() const
 	{

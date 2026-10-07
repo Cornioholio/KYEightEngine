@@ -241,9 +241,19 @@ namespace KYEightEditor
 
 		ImGui::Separator();
 
-		ImGui::Text("Player");
-		ImGui::Text("Cube");
-		ImGui::Text("Camera");
+		const KYEight::Registry& registry = engine_->GetRegistry();
+
+		for (KYEight::Entity entity : registry.GetActiveEntities()) 
+		{
+			if (!registry.HasComponent<KYEight::NameComponent>(entity)) 
+			{
+				continue;
+			}
+
+			const KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(entity);
+
+			ImGui::Text("%s", name.name_.c_str());
+		}
 
 		ImGui::End();
 	}

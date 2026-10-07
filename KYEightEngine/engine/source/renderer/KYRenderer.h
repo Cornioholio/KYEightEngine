@@ -24,8 +24,12 @@ namespace KYEight
 		KYRenderer& operator=(KYRenderer&&) = delete;
 
 		bool Initialise();
-		void RenderFrame();
+		void BeginFrame();
+		void EndFrame();
 		void Shutdown();
+
+		// Camera access
+		const Camera3D& GetCamera() const;
 
 		// Editor access
 		float GetAspectRatio() const;

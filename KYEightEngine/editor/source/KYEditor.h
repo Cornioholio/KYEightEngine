@@ -1,8 +1,12 @@
 #pragma once
+// Engine and rendering
 #include "core/KYEngine.h"
 #include "renderer/ViewportTarget.h"
-
 #include "PlaySession.h"
+// Entities
+#include "ecs/Registry.h"
+#include "ecs/components/CoreComponents.h"
+
 
 #include "rlImGui.h"
 #include "imgui_internal.h"

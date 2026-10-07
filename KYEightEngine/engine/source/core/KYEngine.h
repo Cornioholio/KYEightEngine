@@ -1,6 +1,9 @@
 #pragma once
 #include "renderer/KYRenderer.h"
 
+#include "ecs/Registry.h"
+#include "ecs/systems/MeshSystem.h"
+
 #include <iostream>
 
 /// <summary>
@@ -32,11 +35,17 @@ namespace KYEight
 		void Shutdown();
 
 		// Getters for editor use.
+		Registry& GetRegistry();
+		const Registry& GetRegistry() const;
 		float GetViewportAspectRatio() const;
 		RenderTexture2D GetViewportTexture() const;
 	private:
 		// Systems
 		KYRenderer* renderer = nullptr;
 
+		Registry registry_;
+		MeshSystem meshSystem_;
+
+		Entity cubeEntity_ = NullEntity;
 	};
 }

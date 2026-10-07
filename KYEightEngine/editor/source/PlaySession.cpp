@@ -32,6 +32,7 @@ namespace KYEightEditor
 
 		playing = false;
 
+		return true;
 	}
 
 	bool PlaySession::isPlaying() const
