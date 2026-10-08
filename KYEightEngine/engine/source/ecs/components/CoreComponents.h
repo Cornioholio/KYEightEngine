@@ -15,6 +15,7 @@ namespace KYEight
 	};
 	struct MeshComponent 
 	{
+		Model model_;
 		Color colour_ = RED;
 	};
 	struct NameComponent 

@@ -32,7 +32,11 @@ namespace KYEight
 
 		registry_.AddComponent<NameComponent>(cubeEntity, "Shes turned the weans against us");
 		registry_.AddComponent<Transform3D>(cubeEntity);
-		registry_.AddComponent<MeshComponent>(cubeEntity);
+
+		MeshComponent mesh;
+		Mesh cubeMesh = GenMeshCube(1.f, 1.f, 1.f);
+		mesh.model_ = LoadModelFromMesh(cubeMesh);
+		registry_.AddComponent<MeshComponent>(cubeEntity, mesh);
 
 		return true;
 
