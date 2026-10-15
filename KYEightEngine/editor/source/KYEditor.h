@@ -13,54 +13,54 @@
 
 namespace KYEightEditor 
 {
-	class KYEditor 
-	{
-	public:
-		KYEditor();
-		~KYEditor();
+class KYEditor 
+{
+public:
+	KYEditor();
+	~KYEditor();
 
-		// Disable copy and move semantics
-		KYEditor(const KYEditor&) = delete;
-		KYEditor& operator=(const KYEditor&) = delete;
+	// Disable copy and move semantics
+	KYEditor(const KYEditor&) = delete;
+	KYEditor& operator=(const KYEditor&) = delete;
 
-		KYEditor(KYEditor&&) = delete;
-		KYEditor& operator=(KYEditor&&) = delete;
+	KYEditor(KYEditor&&) = delete;
+	KYEditor& operator=(KYEditor&&) = delete;
 
-		bool Initialise();
-		void Run();
-		void Shutdown();
+	bool Initialise();
+	void Run();
+	void Shutdown();
 
-	private:
-		void DrawEditorUI();
+private:
+	void DrawEditorUI();
 
-		void SetupDockSpace(ImGuiID dockID);
+	void SetupDockSpace(ImGuiID dockID);
 
-		void DrawToolbar();
+	void DrawToolbar();
 
-		// UI Windows
-		void DrawSceneHierarchy();
-		void DrawViewport();
-		void DrawInspector();
-		void DrawBottomPanel();
+	// UI Windows
+	void DrawSceneHierarchy();
+	void DrawViewport();
+	void DrawInspector();
+	void DrawBottomPanel();
 
-		void DrawFiles();
-		void DrawConsole();
+	void DrawFiles();
+	void DrawConsole();
 		
-		// Inspector entity properties
-		void DrawTransforms(KYEight::Entity entity);
+	// Inspector entity properties
+	void DrawTransforms(KYEight::Entity entity);
 
 
-		KYEight::Entity selectedEntity_ = KYEight::NullEntity;
+	KYEight::Entity selectedEntity_ = KYEight::NullEntity;
 
-		KYEight::ViewportTarget viewportTarget_;
-		KYEight::KYEngine* engine_ = nullptr;
-		PlaySession playSession_;
+	KYEight::ViewportTarget viewportTarget_;
+	std::unique_ptr<KYEight::KYEngine> engine_ = nullptr;
+	PlaySession playSession_;
 
-		// Editor window
-		unsigned int editorWindowHeight_ = 1080;
-		unsigned int editorWindowWidth_ = 1920;
+	// Editor window
+	const unsigned int editorWindowHeight_ = 1080;
+	const unsigned int editorWindowWidth_ = 1920;
 
-		const char* editorWindowTitle_ = "Choaklit creem";
+	const char* editorWindowTitle_ = "Choaklit creem";
 
-	};
+};
 }

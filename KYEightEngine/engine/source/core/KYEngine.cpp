@@ -27,16 +27,27 @@ namespace KYEight
 			return false;
 		}
 		
-		// Temporary entity test
+		// Temporary entity test, Cube
 		Entity cubeEntity = registry_.CreateEntity();
 
 		registry_.AddComponent<NameComponent>(cubeEntity, "Shes turned the weans against us");
 		registry_.AddComponent<Transform3D>(cubeEntity);
 
-		MeshComponent mesh;
+		MeshComponent cMesh;
 		Mesh cubeMesh = GenMeshCube(1.f, 1.f, 1.f);
-		mesh.model_ = LoadModelFromMesh(cubeMesh);
-		registry_.AddComponent<MeshComponent>(cubeEntity, mesh);
+		cMesh.model_ = LoadModelFromMesh(cubeMesh);
+		registry_.AddComponent<MeshComponent>(cubeEntity, cMesh);
+		
+		// Sphere
+		Entity sphereEntity = registry_.CreateEntity();
+
+		registry_.AddComponent<NameComponent>(sphereEntity, "You're a toilet");
+		registry_.AddComponent<Transform3D>(sphereEntity);
+
+		MeshComponent sMesh;
+		Mesh sphereMesh = GenMeshSphere(2.f, 16.f, 16.f);
+		sMesh.model_ = LoadModelFromMesh(sphereMesh);
+		registry_.AddComponent<MeshComponent>(sphereEntity, sMesh);
 
 		return true;
 

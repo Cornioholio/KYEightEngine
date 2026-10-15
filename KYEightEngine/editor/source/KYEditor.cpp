@@ -4,13 +4,10 @@ namespace KYEightEditor
 {
 	KYEditor::KYEditor() : viewportTarget_(1280, 720)
 	{
-		engine_ = new KYEight::KYEngine(viewportTarget_);
+		engine_ = std::make_unique<KYEight::KYEngine>(viewportTarget_);
 	}
-	KYEditor::~KYEditor()
-	{
-		delete engine_;
-		engine_ = nullptr;
-	}
+
+	KYEditor::~KYEditor() = default;
 
 	bool KYEditor::Initialise()
 	{
@@ -34,10 +31,7 @@ namespace KYEightEditor
 
 		// Allow docking
 		ImGuiIO& io = ImGui::GetIO();
-
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-		// Set callback for the UIDrawing
 
 		return true;
 
@@ -252,7 +246,7 @@ namespace KYEightEditor
 
 			const KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(entity);
 
-			bool selected = (selectedEntity_ == entity);
+			const bool selected = selectedEntity_ == entity;
 
 			if (ImGui::Selectable(name.name_.c_str(), selectedEntity_)) 
 			{
@@ -274,6 +268,12 @@ namespace KYEightEditor
 			ImGui::End();
 			return;
 		}
+
+		// Display name of entity
+		KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(selectedEntity_);
+		ImGui::Text(name.name_.c_str());
+
+		ImGui::Separator();
 
 		// Draw entity properties
 		DrawTransforms(selectedEntity_);
