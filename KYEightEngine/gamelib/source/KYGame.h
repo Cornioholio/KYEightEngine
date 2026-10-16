@@ -1,6 +1,11 @@
 #pragma once
 #include "core/KYEngine.h"
 #include "renderer/WindowTarget.h"	
+#include "domain/KYDomain.h"
+#include "domain/KYDomainSerialiser.h"
+#include "domain/KYDomainConverter.h"
+
+#include <memory>
 
 /// <summary>
 /// KYGame encapsulates the game loop and manages the game engine and window target for rendering.
@@ -27,9 +32,9 @@ namespace KYEightGame
 		void Shutdown();
 
 	private:
-		KYEight::WindowTarget windowTarget;
+		KYEight::WindowTarget windowTarget_;
 
-		KYEight::KYEngine* engine = nullptr;
+		std::unique_ptr<KYEight::KYEngine> engine_ = nullptr;
 	
 	};
 }

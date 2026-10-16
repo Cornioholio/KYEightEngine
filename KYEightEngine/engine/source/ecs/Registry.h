@@ -84,7 +84,7 @@ namespace KYEight
 			if (it == componentStorage_.end()) 
 			{
 				// use logger later
-				std::cout << "Component storage does not exist\n";
+				throw std::out_of_range("Component storage does not exist");
 			}
 
 			const auto* storage = static_cast<const ComponentStorage<T>*>(it->second.get());

@@ -2,6 +2,9 @@ add_library(KYEightEngine STATIC
 	# Explicitly list .cpp's
 	# Core
 	source/core/KYEngine.cpp
+	# Domain
+	source/domain/KYDomainSerialiser.cpp
+	source/domain/KYDomainConverter.cpp
 	# ECS
 	source/ecs/Registry.cpp
 	# Renderer

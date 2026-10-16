@@ -33,4 +33,3 @@ endif()
 if (KYEIGHT_BUILD_GAME)
 	add_subdirectory(gameexe)
 endif()
-
