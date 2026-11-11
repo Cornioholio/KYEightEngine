@@ -11,5 +11,9 @@ public:
 	static KYDomain FromRegistry(const Registry& registry);
 
 	static void ToRegistry(const KYDomain& domain, Registry& registry);
+
+private:
+	static Model CreatePrimitiveModel(const PrimitiveMeshData& primitive);
+
 };
 }

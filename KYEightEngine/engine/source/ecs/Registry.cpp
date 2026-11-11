@@ -33,4 +33,14 @@ namespace KYEight
 		// Returns true if this entity exists in set
 		return activeEntities_.contains(entity);
 	}
+
+	void Registry::Clear() 
+	{
+		std::vector<Entity> entitiesToDestroy(activeEntities_.begin(), activeEntities_.end());
+
+		for (Entity entity : entitiesToDestroy)
+		{
+			DestroyEntity(entity);
+		}
+	}
 }

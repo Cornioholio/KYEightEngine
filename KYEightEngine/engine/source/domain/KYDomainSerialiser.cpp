@@ -10,7 +10,7 @@
 #include "nlohmann/json.hpp"
 
 namespace KYEight 
-{
+{ 
 	// Helpers
 	namespace 
 	{
@@ -73,6 +73,134 @@ namespace KYEight
 
 			return true;
 		}
+		bool ReadColour(
+			const nlohmann::json& object,
+			Color& colour,
+			const std::string& entityDescription,
+			std::string* error)
+		{
+			if (!object.is_array() || object.size() != 4)
+			{
+				SetError(error, entityDescription + ": colour must contain 4 values.");
+
+				return false;
+			}
+
+			unsigned char* channels[] =
+			{
+				&colour.r,
+				&colour.g,
+				&colour.b,
+				&colour.a
+			};
+
+			for (std::size_t i = 0; i < 4; i++)
+			{
+				if (!object[i].is_number_integer())
+				{
+					SetError(error, entityDescription + ": colour contains a non integer value.");
+					return false;
+				}
+
+				const int value = object[i].get<int>();
+
+				if (value < 0 || value > 255)
+				{
+					SetError(error, entityDescription + ": colour values must be between 0 & 255.");
+
+					return false;
+				}
+
+				*channels[i] = static_cast<unsigned char>(value);
+			}
+			return true;
+		}
+
+		bool ReadMesh(
+			const nlohmann::json& object,
+			KYDomainMesh& mesh,
+			const std::string& entityDescription,
+			std::string* error)
+		{
+			if (!object.is_object())
+			{
+				SetError(error, entityDescription + ": mesh must be an object");
+				return false;
+			}
+
+			const auto primitiveIterator = object.find("primitive");
+
+			if (primitiveIterator == object.end() ||
+				!primitiveIterator->is_string())
+			{
+				SetError(error, entityDescription + ": missing or invalid mesh primitive.");
+				return false;
+			}
+
+			const std::string primitiveName = primitiveIterator->get<std::string>();
+
+			if (primitiveName == "cube")
+			{
+				mesh.primitive_.type_ = MeshPrimitive::Cube;
+			}
+			else if (primitiveName == "sphere")
+			{
+				mesh.primitive_.type_ = MeshPrimitive::Sphere;
+			}
+			else
+			{
+				SetError(error, entityDescription + ": unsupported mesh primitive '" + primitiveName + "'.");
+				return false;
+			}
+
+			if (!ReadVector3(object, "dimensions", mesh.primitive_.dimensions_, entityDescription, error))
+			{
+				return false;
+			}
+
+			if (mesh.primitive_.dimensions_.x <= 0.f ||
+				mesh.primitive_.dimensions_.y <= 0.f ||
+				mesh.primitive_.dimensions_.z <= 0.f)
+			{
+				SetError(error, entityDescription + ": mesh dimensions must be positive.");
+				return false;
+			}
+
+			const auto slicesIterator = object.find("slices");
+			const auto ringsIterator = object.find("rings");
+
+			if (slicesIterator == object.end() ||
+				!slicesIterator->is_number_integer() ||
+				ringsIterator == object.end() ||
+				!ringsIterator->is_number_integer())
+			{
+				SetError(error, entityDescription + ": invalid sphere resolution");
+				return false;
+			}
+
+			mesh.primitive_.slices_ = slicesIterator->get<int>();
+			mesh.primitive_.rings_ = ringsIterator->get<int>();
+
+			if (mesh.primitive_.slices_ < 3 ||
+				mesh.primitive_.rings_ < 3 ||
+				mesh.primitive_.slices_ > 256 ||
+				mesh.primitive_.rings_ > 256)
+			{
+				SetError(error, entityDescription + ": sphere resolution must be between 3 and 256.");
+
+				return false;
+			}
+
+			const auto colourIterator = object.find("colour");
+
+			if (colourIterator == object.end() ||
+				!ReadColour(*colourIterator, mesh.colour_, entityDescription, error))
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 
 	bool KYDomainSerialiser::Save(const KYDomain& domain, const std::string& filepath, std::string* error) 
@@ -131,6 +259,54 @@ namespace KYEight
 								transform.scale_.z
 
 							}
+						}
+					};
+				}
+				if (entity.mesh_.has_value()) 
+				{
+					const KYDomainMesh& mesh = *entity.mesh_;
+					const PrimitiveMeshData& primitive = mesh.primitive_;
+
+					const char* primitiveName = nullptr;
+
+					switch (primitive.type_) 
+					{
+					case MeshPrimitive::Cube:
+						primitiveName = "cube";
+						break;
+					case MeshPrimitive::Sphere:
+						primitiveName = "sphere";
+						break;
+					}
+					if (primitiveName == nullptr) 
+					{
+						SetError(error, "Cannot save scene: unsupported mesh primitive");
+
+						return false;
+					}
+
+					savedEntity["mesh"] =
+					{
+						{"primitive", primitiveName},
+						{
+							"dimensions",
+							{
+								primitive.dimensions_.x,
+								primitive.dimensions_.y,
+								primitive.dimensions_.z
+							}
+						},
+						{"slices", primitive.slices_},
+						{"rings", primitive.rings_},
+						{
+							"colour",
+							{
+								mesh.colour_.r,
+								mesh.colour_.g,
+								mesh.colour_.b,
+								mesh.colour_.a
+							}
+
 						}
 					};
 				}
@@ -314,6 +490,24 @@ namespace KYEight
 					entity.transform_ = transform;
 				}
 
+				const auto meshIterator = savedEntity.find("mesh");
+
+				if (meshIterator != savedEntity.end())
+				{
+					KYDomainMesh mesh;
+
+					if (!ReadMesh(
+						*meshIterator,
+						mesh,
+						entityDescription,
+						error))
+					{
+						return false;
+					}
+
+					entity.mesh_ = mesh;
+				}
+
 				loadedDomain.entities_.push_back(std::move(entity));
 			}
 
@@ -331,5 +525,4 @@ namespace KYEight
 			return false;
 		}
 	}
-
 }

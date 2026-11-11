@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "raylib.h"
-
+#include <optional>
 namespace KYEight 
 {
 	/// <summary>
@@ -13,12 +13,36 @@ namespace KYEight
 		Vector3 rotation_ = { 0.f, 0.f, 0.f };
 		Vector3 scale_ = { 1.f, 1.f, 1.f };
 	};
-	
+	/// <summary>
+	/// Supported procedural mesh types
+	/// </summary>
+	enum class MeshPrimitive 
+	{
+		Cube,
+		Sphere
+	};
+	/// <summary>
+	/// Describes a procedural mesh independently of its runtime model
+	/// </summary>
+	struct PrimitiveMeshData 
+	{
+		MeshPrimitive type_ = MeshPrimitive::Cube;
+
+		// Cube: width, height, depth
+		// Sphere: radius in x
+		Vector3 dimensions_ = { 1.f, 1.f, 1.f };
+
+		// When generating spheres
+		int slices_ = 16;
+		int rings_ = 16;
+	};
 
 	struct MeshComponent 
 	{
-		Model model_;
+		Model model_{};
 		Color colour_ = RED;
+
+		std::optional<PrimitiveMeshData> primitive_;
 	};
 
 	/// <summary>

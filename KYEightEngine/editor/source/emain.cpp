@@ -10,7 +10,7 @@ int main()
 		return -1;
 	}
 
-	// Render editor ui
+	// Render editor UI
 	editor.Run();
 
 	editor.Shutdown();

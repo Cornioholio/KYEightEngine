@@ -1,335 +1,514 @@
 #include "KYEditor.h"
 
+// Editor UI
+#include "rlImGui.h"
+#include "imgui_internal.h"
+
+// ECS
+#include "ecs/Registry.h"
+#include "ecs/components/CoreComponents.h"
+
+#include <memory>
+
+
 namespace KYEightEditor
 {
-	KYEditor::KYEditor() : viewportTarget_(1280, 720)
+
+KYEditor::KYEditor() : viewportTarget_(1280, 720)
+{
+	engine_ = std::make_unique<KYEight::KYEngine>(viewportTarget_);
+}
+
+KYEditor::~KYEditor() = default;
+
+bool KYEditor::Initialise()
+{
+	// Set editor window properties, resizable and vsync, then create window
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+	InitWindow(editorWindowWidth_, editorWindowHeight_, editorWindowTitle_);
+	MaximizeWindow();
+
+	// Dont allow initialisation if window or engine arent both ready
+	if (!IsWindowReady())
 	{
-		engine_ = std::make_unique<KYEight::KYEngine>(viewportTarget_);
+		return false;
+	}
+	if (!engine_->Initialise())
+	{
+		return false;
 	}
 
-	KYEditor::~KYEditor() = default;
+	CreateTestObjects();
 
-	bool KYEditor::Initialise()
+	// Start setup for raylib/imgui connection
+	rlImGuiSetup(true);
+
+	// Allow ui docking
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	return true;
+
+}
+void KYEditor::Run()
+{
+	// Editor runtime
+	while (!WindowShouldClose())
 	{
-		// Set editor window properties, resizable and vsync 
-		SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
-		InitWindow(editorWindowWidth_, editorWindowHeight_, editorWindowTitle_);
-		MaximizeWindow();
+		// Play session only updates when play is pressed and play session is active
+		playSession_.Update(*engine_);
 
-		// Dont allow initialisation if window or engine arent both ready
-		if (!IsWindowReady())
-		{
-			return false;
-		}
-		if (!engine_->Initialise())
-		{
-			return false;
-		}
-
-		// Start setup for raylib <=> imgui connection
-		rlImGuiSetup(true);
-
-		// Allow docking
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-		return true;
-
+		// Rendeirng always happens
+		engine_->Render();
+		DrawEditorUI();
 	}
-	void KYEditor::Run()
-	{
-		// Editor runtime
-		while (!WindowShouldClose())
-		{
-			// Play session only updates when play is pressed, engine & ui rendering always happens 
-			playSession_.Update(*engine_);
+}
+void KYEditor::Shutdown()
+{
+	// Stop gameplay befoer shutting systems it owns down
+	playSession_.Stop(*engine_);
 
-			engine_->Render();
+	rlImGuiShutdown();
+	engine_->Shutdown();
 
-			DrawEditorUI();
-		}
-	}
-	void KYEditor::Shutdown()
-	{
-		// Shutdown editor and clean up
-		playSession_.Stop(*engine_);
+	CloseWindow();
+}
 
-		rlImGuiShutdown();
+void KYEditor::DrawEditorUI()
+{
+	BeginDrawing();
 
-		engine_->Shutdown();
+	ClearBackground(DARKGRAY);
 
-		CloseWindow();
-	}
+	rlImGuiBegin();
 
-	void KYEditor::DrawEditorUI()
-	{
-		BeginDrawing();
+	DrawToolbar();
+	DrawSceneErrorPopup();
 
-		ClearBackground(DARKGRAY);
-
-		rlImGuiBegin();
-
-		DrawToolbar();
-
-		ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 		
-		ImVec2 dockSpacePos = viewport->WorkPos;
-		dockSpacePos.y += 45.f;
+	ImVec2 dockSpacePos = viewport->WorkPos;
+	dockSpacePos.y += 45.f;
 
-		ImVec2 dockSpaceSize = viewport->WorkSize;
-		dockSpaceSize.y -= 45.f;
+	ImVec2 dockSpaceSize = viewport->WorkSize;
+	dockSpaceSize.y -= 45.f;
 		
 
-		ImGui::SetNextWindowPos(dockSpacePos);
-		ImGui::SetNextWindowSize(dockSpaceSize);
-		ImGui::SetNextWindowViewport(viewport->ID);
+	ImGui::SetNextWindowPos(dockSpacePos);
+	ImGui::SetNextWindowSize(dockSpaceSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-		ImGuiWindowFlags dockFlags =
-			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_NoNavFocus |
-			ImGuiWindowFlags_NoBackground;
+	ImGuiWindowFlags dockFlags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoBringToFrontOnFocus |
+		ImGuiWindowFlags_NoNavFocus |
+		ImGuiWindowFlags_NoBackground;
 
-		ImGui::Begin("KYEight Editorm", nullptr, dockFlags);
+	ImGui::Begin("KYEight Editorm", nullptr, dockFlags);
 
-		ImGui::PopStyleVar(2);
+	ImGui::PopStyleVar(2);
 
-		ImGuiID dockID = ImGui::GetID("KYEightDockSpace");
+	ImGuiID dockID = ImGui::GetID("KYEightDockSpace");
 
-		ImGui::DockSpace(dockID, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_None);
+	ImGui::DockSpace(dockID, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_None);
 
-		SetupDockSpace(dockID);
+	SetupDockSpace(dockID);
 
-		ImGui::End();
+	ImGui::End();
 
-		DrawSceneHierarchy();
-		DrawViewport();
-		DrawInspector();
-		DrawBottomPanel();
+	DrawSceneHierarchy();
+	DrawViewport();
+	DrawInspector();
+	DrawBottomPanel();
 
-		rlImGuiEnd();
+	rlImGuiEnd();
 
-		EndDrawing();
+	EndDrawing();
+}
+
+void KYEditor::SetupDockSpace(unsigned int dockID)
+{
+	static bool layoutBuilt = false;
+
+	if (layoutBuilt)
+	{
+		return;
 	}
 
-	void KYEditor::SetupDockSpace(ImGuiID dockID)
+	layoutBuilt = true;
+
+	ImGui::DockBuilderRemoveNode(dockID);
+
+	ImGui::DockBuilderAddNode(dockID, ImGuiDockNodeFlags_DockSpace);
+
+	ImGui::DockBuilderSetNodeSize(dockID, ImGui::GetMainViewport()->WorkSize);
+
+	ImGuiID dockMain = dockID;
+
+	// Left panel
+	ImGuiID dockLeft;
+
+	ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Left, 0.2f, &dockLeft, &dockMain);
+
+	// Right panel
+	ImGuiID dockRight;
+
+	ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Right, 0.2f, &dockRight, &dockMain);
+
+	// Bottom panel
+	ImGuiID dockBottom;
+
+	ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Down, 0.2f, &dockBottom, &dockMain);
+
+	// Assign all windows
+	ImGui::DockBuilderDockWindow("Objects", dockLeft);
+	ImGui::DockBuilderDockWindow("Viewport", dockMain);
+	ImGui::DockBuilderDockWindow("Inspector", dockRight);
+	ImGui::DockBuilderDockWindow("File Explorer", dockBottom);
+
+	ImGui::DockBuilderFinish(dockID);
+}
+
+void KYEditor::DrawViewport()
+{
+	ImGui::Begin("Viewport");
+
+	ImVec2 availableSize = ImGui::GetContentRegionAvail();
+	const float aspectRatio = engine_->GetViewportAspectRatio();
+
+	// Fit rendered viewport inside the available panel while preserving aspect ratio.
+	float viewportWidth = availableSize.x;
+	float viewportHeight = viewportWidth / engine_->GetViewportAspectRatio();
+
+	// If calculated height is too large, constrain by height instead
+	if (viewportHeight > availableSize.y)
 	{
-		static bool layoutBuilt = false;
-
-		if (layoutBuilt)
-		{
-			return;
-		}
-
-		layoutBuilt = true;
-
-		ImGui::DockBuilderRemoveNode(dockID);
-
-		ImGui::DockBuilderAddNode(dockID, ImGuiDockNodeFlags_DockSpace);
-
-		ImGui::DockBuilderSetNodeSize(dockID, ImGui::GetMainViewport()->WorkSize);
-
-		ImGuiID dockMain = dockID;
-
-		// Left panel
-		ImGuiID dockLeft;
-
-		ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Left, 0.2f, &dockLeft, &dockMain);
-
-		// Right panel
-		ImGuiID dockRight;
-
-		ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Right, 0.2f, &dockRight, &dockMain);
-
-		// Bottom panel
-		ImGuiID dockBottom;
-
-		ImGui::DockBuilderSplitNode(dockMain, ImGuiDir_Down, 0.2f, &dockBottom, &dockMain);
-
-		// Assign all windows
-		ImGui::DockBuilderDockWindow("Objects", dockLeft);
-		ImGui::DockBuilderDockWindow("Viewport", dockMain);
-		ImGui::DockBuilderDockWindow("Inspector", dockRight);
-		ImGui::DockBuilderDockWindow("File Explorer", dockBottom);
-
-		ImGui::DockBuilderFinish(dockID);
+		viewportHeight = availableSize.y;
+		viewportWidth = viewportHeight * engine_->GetViewportAspectRatio();
 	}
 
-	void KYEditor::DrawViewport()
+	// Center the viewport inside panel
+	ImVec2 dockMiddle = ImGui::GetCursorPos();
+
+	dockMiddle.x += (availableSize.x - viewportWidth) * 0.5f;
+	dockMiddle.y += (availableSize.y - viewportHeight) * 0.5f;
+
+	ImGui::SetCursorPos(dockMiddle);
+
+	RenderTexture2D viewport = engine_->GetViewportTexture();
+
+	// Flip vertical texture coordinates to account for render texture orientation.
+	ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(viewportWidth, viewportHeight), ImVec2(0, 1), ImVec2(1, 0));
+
+	ImGui::End();
+}
+void KYEditor::DrawToolbar()
+{
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+
+	ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
+
+	ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), 45.f), ImGuiCond_Always);
+
+	ImGui::Begin("Tool Bar", nullptr, flags);
+
+	if (!playSession_.isPlaying())
 	{
-		ImGui::Begin("Viewport");
-
-		// Real time resizing letterboxing, based on aspect ratio.
-		ImVec2 availableSize = ImGui::GetContentRegionAvail();
-
-		float viewportWidth = availableSize.x;
-		float viewportHeight = viewportWidth / engine_->GetViewportAspectRatio();
-
-		// If calculated height is too large, constrain by height instead
-		if (viewportHeight > availableSize.y)
+		if (ImGui::Button("Play"))
 		{
-			viewportHeight = availableSize.y;
-			viewportWidth = viewportHeight * engine_->GetViewportAspectRatio();
+			playSession_.Start(*engine_);
 		}
-
-		ImVec2 dockMiddle = ImGui::GetCursorPos();
-
-		dockMiddle.x += (availableSize.x - viewportWidth) * 0.5f;
-		dockMiddle.y += (availableSize.y - viewportHeight) * 0.5f;
-
-		ImGui::SetCursorPos(dockMiddle);
-
-		RenderTexture2D viewport = engine_->GetViewportTexture();
-
-		ImGui::Image((ImTextureID)(uintptr_t)viewport.texture.id, ImVec2(viewportWidth, viewportHeight), ImVec2(0, 1), ImVec2(1, 0));
-
-		ImGui::End();
 	}
-	void KYEditor::DrawToolbar()
+	else
 	{
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-
-		ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
-
-		ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), 45.f), ImGuiCond_Always);
-
-		ImGui::Begin("Tool Bar", nullptr, flags);
-
-		if (!playSession_.isPlaying())
+		if (ImGui::Button("Stop"))
 		{
-			if (ImGui::Button("Play"))
-			{
-				playSession_.Start(*engine_);
-			}
+			playSession_.Stop(*engine_);
 		}
-		else
+	}
+
+	ImGui::SameLine();
+
+	ImGui::Button("Pause");
+
+	ImGui::SameLine();
+
+	ImGui::Button("Step");
+
+	ImGui::SameLine();
+	ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+	ImGui::SameLine();
+
+	if (!playSession_.isPlaying())
+	{
+		if (ImGui::Button("Save Scene"))
 		{
-			if (ImGui::Button("Stop"))
-			{
-				playSession_.Stop(*engine_);
-			}
+			SaveScene();
 		}
 
 		ImGui::SameLine();
 
-		ImGui::Button("Pause");
+		if (ImGui::Button("Load Scene"))
+		{
+			LoadScene();
+		}
+	}
 
-		ImGui::SameLine();
+	ImGui::End();
+}
+void KYEditor::DrawSceneHierarchy()
+{
+	ImGui::Begin("Objects");
 
-		ImGui::Button("Step");
+	ImGui::Text("Scene");
+	ImGui::Separator();
 
+	const KYEight::Registry& registry = engine_->GetRegistry();
+
+	for (KYEight::Entity entity : registry.GetActiveEntities()) 
+	{
+		// Only named entities are displayed in the hierarchy
+		if (!registry.HasComponent<KYEight::NameComponent>(entity)) 
+		{
+			continue;
+		}
+
+		const KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(entity);
+
+		const bool selected = selectedEntity_ == entity;
+
+		if (ImGui::Selectable(name.name_.c_str(), selected)) 
+		{
+			selectedEntity_ = entity;
+		}
+	}
+
+	ImGui::End();
+}
+void KYEditor::DrawInspector()
+{
+	ImGui::Begin("Inspector");
+
+	KYEight::Registry& registry = engine_->GetRegistry();
+
+	if (!registry.IsValid(selectedEntity_) ||
+		!registry.HasComponent<KYEight::NameComponent>(selectedEntity_)) 
+	{
+		selectedEntity_ = KYEight::NullEntity;
+
+		ImGui::Text("No entity selected");
 		ImGui::End();
+
+		return;
 	}
-	void KYEditor::DrawSceneHierarchy()
+
+	// Display name of entity
+	KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(selectedEntity_);
+	ImGui::Text("%s", name.name_.c_str());
+
+	ImGui::Separator();
+
+	// Draw entity properties
+	DrawTransforms(selectedEntity_);
+
+	ImGui::End();
+}
+void KYEditor::DrawTransforms(KYEight::Entity entity) 
+{
+	KYEight::Registry& registry = engine_->GetRegistry();
+
+	if (!registry.HasComponent<KYEight::Transform3D>(entity))
 	{
-		ImGui::Begin("Objects");
+		return;
+	}
 
-		ImGui::Text("Scene");
+	KYEight::Transform3D& transform = registry.GetComponent<KYEight::Transform3D>(entity);
 
-		ImGui::Separator();
+	if (!ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		return;
+	}
 
-		const KYEight::Registry& registry = engine_->GetRegistry();
+	ImGui::DragFloat3("Position", &transform.position_.x, 0.1f);
+	ImGui::DragFloat3("Rotation", &transform.rotation_.x, 0.1f);
+	ImGui::DragFloat3("Scale", &transform.scale_.x, 0.1f);
 
-		for (KYEight::Entity entity : registry.GetActiveEntities()) 
+}
+void KYEditor::DrawBottomPanel()
+{
+	ImGui::Begin("File Explorer");
+
+	if (ImGui::BeginTabBar("BottomPanelTabs"))
+	{
+		if (ImGui::BeginTabItem("Files"))
 		{
-			if (!registry.HasComponent<KYEight::NameComponent>(entity)) 
-			{
-				continue;
-			}
+			DrawFiles();
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Console"))
+		{
+			DrawConsole();
 
-			const KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(entity);
-
-			const bool selected = selectedEntity_ == entity;
-
-			if (ImGui::Selectable(name.name_.c_str(), selectedEntity_)) 
-			{
-				selectedEntity_ = entity;
-			}
+			ImGui::EndTabItem();
 		}
 
-		ImGui::End();
+		ImGui::EndTabBar();
 	}
-	void KYEditor::DrawInspector()
+
+	ImGui::End();
+}
+void KYEditor::DrawFiles()
+{
+
+}
+void KYEditor::DrawConsole()
+{
+
+}
+
+// Scene stuff
+void KYEditor::SaveScene() 
+{
+	sceneError_.clear();
+
+	std::error_code filesystemError;
+
+	std::filesystem::create_directories(std::filesystem::path(sceneFilepath_).parent_path(), filesystemError);
+
+	if (filesystemError) 
 	{
-		ImGui::Begin("Inspector");
+		sceneError_ = "Could not create scene directory: " + filesystemError.message();
 
-		KYEight::Registry& registry = engine_->GetRegistry();
+		showSceneError_ = true;
 
-		if (selectedEntity_ == KYEight::NullEntity) 
+		return;
+	}
+
+	if (!engine_->SaveScene(sceneFilepath_, &sceneError_))
+	{
+		showSceneError_ = true;
+	}
+}
+void KYEditor::LoadScene() 
+{
+	if (!engine_->LoadScene(sceneFilepath_, &sceneError_)) 
+	{
+		showSceneError_ = true;
+		return;
+	}
+
+	selectedEntity_ = KYEight::NullEntity;
+}
+void KYEditor::DrawSceneErrorPopup() 
+{
+	if (showSceneError_) 
+	{
+		ImGui::OpenPopup("Scene Error");
+
+		showSceneError_ = false;
+	}
+
+	if (ImGui::BeginPopupModal("Scene Error", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) 
+	{
+		ImGui::TextWrapped("%s", sceneError_.c_str());
+
+		if (ImGui::Button("Ok")) 
 		{
-			ImGui::Text("No entity selected");
-			ImGui::End();
-			return;
+			ImGui::CloseCurrentPopup();
 		}
 
-		// Display name of entity
-		KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(selectedEntity_);
-		ImGui::Text(name.name_.c_str());
-
-		ImGui::Separator();
-
-		// Draw entity properties
-		DrawTransforms(selectedEntity_);
-
-		ImGui::End();
+		ImGui::EndPopup();
 	}
-	void KYEditor::DrawTransforms(KYEight::Entity entity) 
-	{
-		KYEight::Registry& registry = engine_->GetRegistry();
 
-		if (!registry.HasComponent<KYEight::Transform3D>(entity))
-		{
-			return;
-		}
+}
+void KYEditor::CreateTestObjects()
+{
+	KYEight::Registry& registry = engine_->GetRegistry();
 
-		KYEight::Transform3D& transform = registry.GetComponent<KYEight::Transform3D>(entity);
+	// Cube
+	KYEight::Entity cube = registry.CreateEntity();
 
-		if (!ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			return;
-		}
+	KYEight::NameComponent cubeName;
+	cubeName.name_ = "Test Cube";
 
-		ImGui::DragFloat3("Position", &transform.position_.x, 0.1f);
-		ImGui::DragFloat3("Rotation", &transform.rotation_.x, 0.1f);
-		ImGui::DragFloat3("Scale", &transform.scale_.x, 0.1f);
+	KYEight::Transform3D cubeTransform;
+	cubeTransform.position_ = { 0.0f, 1.0f, 0.0f };
+	cubeTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
+	cubeTransform.scale_ = { 1.0f, 1.0f, 1.0f };
 
-	}
-	void KYEditor::DrawBottomPanel()
-	{
-		ImGui::Begin("File Explorer");
+	KYEight::MeshComponent cubeMesh;
+	cubeMesh.model_ = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
+	cubeMesh.colour_ = RED;
 
-		if (ImGui::BeginTabBar("BottomPanelTabs"))
-		{
-			if (ImGui::BeginTabItem("Files"))
-			{
-				DrawFiles();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Console"))
-			{
-				DrawConsole();
+	KYEight::PrimitiveMeshData cubePrimitive;
+	cubePrimitive.type_ = KYEight::MeshPrimitive::Cube;
+	cubePrimitive.dimensions_ = { 1.0f, 1.0f, 1.0f };
 
-				ImGui::EndTabItem();
-			}
+	cubeMesh.primitive_ = cubePrimitive;
 
-			ImGui::EndTabBar();
-		}
+	registry.AddComponent<KYEight::NameComponent>(cube, cubeName);
+	registry.AddComponent<KYEight::Transform3D>(cube, cubeTransform);
+	registry.AddComponent<KYEight::MeshComponent>(cube, cubeMesh);
 
-		ImGui::End();
-	}
-	void KYEditor::DrawFiles()
-	{
 
-	}
-	void KYEditor::DrawConsole()
-	{
+	// Sphere
+	KYEight::Entity sphere = registry.CreateEntity();
 
-	}
+	KYEight::NameComponent sphereName;
+	sphereName.name_ = "Test Sphere";
+
+	KYEight::Transform3D sphereTransform;
+	sphereTransform.position_ = { 2.0f, 1.0f, 0.0f };
+	sphereTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
+	sphereTransform.scale_ = { 1.0f, 1.0f, 1.0f };
+
+	KYEight::MeshComponent sphereMesh;
+	sphereMesh.model_ = LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16));
+	sphereMesh.colour_ = BLUE;
+
+	KYEight::PrimitiveMeshData spherePrimitive;
+	spherePrimitive.type_ = KYEight::MeshPrimitive::Sphere;
+	spherePrimitive.dimensions_ = { 0.5f, 0.5f, 0.5f };
+	spherePrimitive.slices_ = 16;
+	spherePrimitive.rings_ = 16;
+
+	sphereMesh.primitive_ = spherePrimitive;
+
+	registry.AddComponent<KYEight::NameComponent>(sphere, sphereName);
+	registry.AddComponent<KYEight::Transform3D>(sphere, sphereTransform);
+	registry.AddComponent<KYEight::MeshComponent>(sphere, sphereMesh);
+
+
+	// Second cube, with a different transform
+	KYEight::Entity secondCube = registry.CreateEntity();
+
+	KYEight::NameComponent secondCubeName;
+	secondCubeName.name_ = "Test Cube 2";
+
+	KYEight::Transform3D secondCubeTransform;
+	secondCubeTransform.position_ = { -2.0f, 1.0f, 0.0f };
+	secondCubeTransform.rotation_ = { 0.0f, 45.0f, 0.0f };
+	secondCubeTransform.scale_ = { 1.0f, 2.0f, 1.0f };
+
+	KYEight::MeshComponent secondCubeMesh;
+	secondCubeMesh.model_ = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
+	secondCubeMesh.colour_ = GREEN;
+
+	KYEight::PrimitiveMeshData secondCubePrimitive;
+	secondCubePrimitive.type_ = KYEight::MeshPrimitive::Cube;
+	secondCubePrimitive.dimensions_ = { 1.0f, 1.0f, 1.0f };
+
+	secondCubeMesh.primitive_ = secondCubePrimitive;
+
+	registry.AddComponent<KYEight::NameComponent>(secondCube, secondCubeName);
+	registry.AddComponent<KYEight::Transform3D>(secondCube, secondCubeTransform);
+	registry.AddComponent<KYEight::MeshComponent>(secondCube, secondCubeMesh);
+}
 }

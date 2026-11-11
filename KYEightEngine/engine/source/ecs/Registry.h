@@ -39,6 +39,9 @@ namespace KYEight
 		// Check if entity exists
 		bool IsValid(Entity entity) const;
 
+		// Clears registry
+		void Clear();
+
 		template<typename T, typename... Args>
 		T& AddComponent(Entity entity, Args&&... args)
 		{

@@ -1,5 +1,8 @@
 #pragma once
 #include "renderer/KYRenderer.h"
+#include "domain/KYDomain.h"
+#include "domain/KYDomainConverter.h"
+#include "domain/KYDomainSerialiser.h"
 
 #include "ecs/Registry.h"
 #include "ecs/systems/MeshSystem.h"
@@ -34,6 +37,9 @@ namespace KYEight
 		// Clean up 
 		void Shutdown();
 
+		bool SaveScene(const std::string& filepath, std::string* error = nullptr);
+		bool LoadScene(const std::string& filepath, std::string* error = nullptr);
+
 		// Getters for editor use.
 		Registry& GetRegistry();
 		const Registry& GetRegistry() const;
@@ -45,7 +51,5 @@ namespace KYEight
 
 		Registry registry_;
 		MeshSystem meshSystem_;
-
-		Entity cubeEntity_ = NullEntity;
 	};
 }

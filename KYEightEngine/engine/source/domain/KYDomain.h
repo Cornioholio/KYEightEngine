@@ -7,6 +7,12 @@
 
 namespace KYEight 
 {
+	struct KYDomainMesh
+	{
+		PrimitiveMeshData primitive_;
+		Color colour_ = RED;
+	};
+
 	/// <summary>
 	/// Persistent representation of one scene ('domain'), contains serializable data
 	/// </summary>
@@ -14,6 +20,7 @@ namespace KYEight
 	{
 		std::optional<NameComponent> name_;
 		std::optional<Transform3D> transform_;
+		std::optional<KYDomainMesh> mesh_;
 	};
 
 	/// <summary>
@@ -21,7 +28,7 @@ namespace KYEight
 	/// </summary>
 	struct KYDomain 
 	{
-		static constexpr int currentVersion_ = 1;
+		static constexpr int currentVersion_ = 2;
 
 		std::vector<KYDomainEntity> entities_;
 	};

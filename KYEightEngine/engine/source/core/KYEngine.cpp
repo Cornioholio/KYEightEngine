@@ -27,30 +27,7 @@ namespace KYEight
 			return false;
 		}
 		
-		// Temporary entity test, Cube
-		Entity cubeEntity = registry_.CreateEntity();
-
-		registry_.AddComponent<NameComponent>(cubeEntity, "Shes turned the weans against us");
-		registry_.AddComponent<Transform3D>(cubeEntity);
-
-		MeshComponent cMesh;
-		Mesh cubeMesh = GenMeshCube(1.f, 1.f, 1.f);
-		cMesh.model_ = LoadModelFromMesh(cubeMesh);
-		registry_.AddComponent<MeshComponent>(cubeEntity, cMesh);
-		
-		// Sphere
-		Entity sphereEntity = registry_.CreateEntity();
-
-		registry_.AddComponent<NameComponent>(sphereEntity, "You're a toilet");
-		registry_.AddComponent<Transform3D>(sphereEntity);
-
-		MeshComponent sMesh;
-		Mesh sphereMesh = GenMeshSphere(2.f, 16.f, 16.f);
-		sMesh.model_ = LoadModelFromMesh(sphereMesh);
-		registry_.AddComponent<MeshComponent>(sphereEntity, sMesh);
-
 		return true;
-
 	}
 	void KYEngine::Shutdown() 
 	{
@@ -79,6 +56,30 @@ namespace KYEight
 		renderer->EndFrame();
 
 	}
+
+
+	bool KYEngine::SaveScene(const std::string& filepath, std::string* error) 
+	{
+		KYDomain domain = KYDomainConverter::FromRegistry(registry_);
+
+		return KYDomainSerialiser::Save(domain, filepath, error);
+	}
+	bool KYEngine::LoadScene(const std::string& filepath, std::string* error)  
+	{
+		KYDomain domain;
+
+		if (!KYDomainSerialiser::Load(domain, filepath, error))
+		{
+			return false;
+		}
+
+		registry_.Clear();
+	
+		KYDomainConverter::ToRegistry(domain, registry_);
+
+		return true;
+	}
+
 
 	// For editor use.
 	Registry& KYEngine::GetRegistry() 
