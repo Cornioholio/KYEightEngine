@@ -39,7 +39,7 @@ namespace KYEight
 		return domain;
 	}
 
-	void KYDomainConverter::ToRegistry(const KYDomain& domain, Registry& registry)
+	void KYDomainConverter::ToRegistry(const KYDomain& domain, Registry& registry, KYResourceManager& resourceManager)
 	{
 		for (const KYDomainEntity& domainEntity : domain.entities_) 
 		{
@@ -61,7 +61,9 @@ namespace KYEight
 
 				MeshComponent mesh;
 
-				mesh.model_ = CreatePrimitiveModel(domainMesh.primitive_);
+				mesh.modelHandle_ = resourceManager.RegisterModel(
+					CreatePrimitiveModel(domainMesh.primitive_)
+				);
 
 				mesh.colour_ = domainMesh.colour_;
 

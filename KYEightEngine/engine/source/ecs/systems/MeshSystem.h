@@ -2,6 +2,8 @@
 #include "ecs/Registry.h"
 #include "ecs/components/CoreComponents.h"
 
+#include "resources/KYResourceManager.h"
+
 #include "raylib.h"
 #include "raymath.h"
 
@@ -10,7 +12,7 @@ namespace KYEight
 	class MeshSystem 
 	{
 	public:
-		void Render(Registry& registry, const Camera3D& camera) const 
+		void Render(Registry& registry, KYResourceManager& resourceManager, const Camera3D& camera) const 
 		{
 			BeginMode3D(camera);
 
@@ -24,7 +26,14 @@ namespace KYEight
 
 				const Transform3D& transform = registry.GetComponent<Transform3D>(entity);
 
-				MeshComponent& mesh = registry.GetComponent<MeshComponent>(entity);
+				const MeshComponent& mesh = registry.GetComponent<MeshComponent>(entity);
+
+				Model* model = resourceManager.GetModel(mesh.modelHandle_);
+
+				if (model == nullptr) 
+				{
+					continue;
+				}
 
 				Matrix rotation = MatrixRotateXYZ({ 
 					transform.rotation_.x * DEG2RAD, 
@@ -41,9 +50,10 @@ namespace KYEight
 					transform.position_.y, 
 					transform.position_.z );
 
-				mesh.model_.transform = MatrixMultiply(MatrixMultiply(scale, rotation), translation);
+				
+				model->transform = MatrixMultiply(MatrixMultiply(scale, rotation), translation);
 
-				DrawModel(mesh.model_, Vector3Zero(), 1.0f, mesh.colour_);
+				DrawModel(*model, Vector3Zero(), 1.0f, mesh.colour_);
 			}
 			EndMode3D();
 		}

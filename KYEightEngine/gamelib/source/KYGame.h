@@ -1,9 +1,13 @@
 #pragma once
 #include "core/KYEngine.h"
+
 #include "renderer/WindowTarget.h"	
+
 #include "domain/KYDomain.h"
 #include "domain/KYDomainSerialiser.h"
 #include "domain/KYDomainConverter.h"
+
+#include "resources/KYResourceManager.h"
 
 #include <memory>
 
@@ -35,6 +39,6 @@ namespace KYEightGame
 		KYEight::WindowTarget windowTarget_;
 
 		std::unique_ptr<KYEight::KYEngine> engine_ = nullptr;
-	
+		
 	};
 }

@@ -11,7 +11,8 @@ add_library(KYEightEngine STATIC
 	source/renderer/KYRenderer.cpp
 	source/renderer/ViewportTarget.cpp
 	source/renderer/WindowTarget.cpp
-)
+	# Resources
+	source/resources/KYResourceManager.cpp)
 
 add_library(KYEight::Engine ALIAS KYEightEngine)
 

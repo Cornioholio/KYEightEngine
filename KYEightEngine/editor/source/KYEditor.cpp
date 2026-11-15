@@ -444,7 +444,9 @@ void KYEditor::CreateTestObjects()
 	cubeTransform.scale_ = { 1.0f, 1.0f, 1.0f };
 
 	KYEight::MeshComponent cubeMesh;
-	cubeMesh.model_ = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
+	cubeMesh.modelHandle_ = engine_->GetResourceManager().RegisterModel(
+		LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f))
+	);
 	cubeMesh.colour_ = RED;
 
 	KYEight::PrimitiveMeshData cubePrimitive;
@@ -470,7 +472,9 @@ void KYEditor::CreateTestObjects()
 	sphereTransform.scale_ = { 1.0f, 1.0f, 1.0f };
 
 	KYEight::MeshComponent sphereMesh;
-	sphereMesh.model_ = LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16));
+	sphereMesh.modelHandle_ = engine_->GetResourceManager().RegisterModel(
+		LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16))
+	);
 	sphereMesh.colour_ = BLUE;
 
 	KYEight::PrimitiveMeshData spherePrimitive;
@@ -498,7 +502,9 @@ void KYEditor::CreateTestObjects()
 	secondCubeTransform.scale_ = { 1.0f, 2.0f, 1.0f };
 
 	KYEight::MeshComponent secondCubeMesh;
-	secondCubeMesh.model_ = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
+	secondCubeMesh.modelHandle_ = engine_->GetResourceManager().RegisterModel(
+		LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f))
+	);
 	secondCubeMesh.colour_ = GREEN;
 
 	KYEight::PrimitiveMeshData secondCubePrimitive;

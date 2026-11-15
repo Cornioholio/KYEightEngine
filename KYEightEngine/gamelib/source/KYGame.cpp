@@ -27,7 +27,7 @@ namespace KYEightGame
 		KYEight::Entity entity = originalRegistry.CreateEntity();
 
 		originalRegistry.AddComponent<KYEight::NameComponent>(
-			entity, "Serialization round-trip test");
+			entity, "Serialization round trip test");
 
 		KYEight::Transform3D transform;
 		transform.position_ = { 1.f, 2.f, 3.f };
@@ -64,8 +64,7 @@ namespace KYEightGame
 		// Reconstruct the ECS into a fresh registry.
 		KYEight::Registry loadedRegistry;
 
-		KYEight::KYDomainConverter::ToRegistry(
-			loadedDomain, loadedRegistry);
+		KYEight::KYDomainConverter::ToRegistry(loadedDomain, loadedRegistry, engine_->GetResourceManager());
 
 		// Verify the reconstructed data.
 		if (loadedRegistry.GetActiveEntities().size() != 1)

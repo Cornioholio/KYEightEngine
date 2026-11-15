@@ -5,25 +5,24 @@ namespace KYEight
 	// Create and dispose of systems here
 	KYEngine::KYEngine(RenderTarget& target) 
 	{
-		renderer = new KYRenderer(target);
-
+		renderer_ = std::make_unique<KYRenderer>(target);
+		resourceManager_ = std::make_unique<KYResourceManager>();
 	}
 	KYEngine::~KYEngine() 
 	{
-		delete renderer;
-		renderer = nullptr;
+
 	}
 	bool KYEngine::Initialise() 
 	{
-		// Make sure renderer exists and initialises
-		if (renderer == nullptr) 
+		// Make sure renderer_ exists and initialises
+		if (renderer_ == nullptr) 
 		{
-			std::cout << "[ENGINE] No instance of renderer exists, could not intiailize renderer\n";
+			std::cout << "[ENGINE] No instance of renderer_ exists, could not intiailize renderer_\n";
 			return false;
 		}
-		if (!renderer->Initialise()) 
+		if (!renderer_->Initialise()) 
 		{
-			std::cout << "[ENGINE} Failed to intialize renderer\n";
+			std::cout << "[ENGINE} Failed to intialize renderer_\n";
 			return false;
 		}
 		
@@ -31,13 +30,24 @@ namespace KYEight
 	}
 	void KYEngine::Shutdown() 
 	{
-		// Renderer should exist to dispose
-		if (renderer == nullptr) 
+		// Clean up systems
+		if (resourceManager_) 
 		{
-			std::cout << "[ENGINE] No instance of renderer exists, could not shut renderer down\n";
+			resourceManager_->Shutdown();
+		} else 
+		{
+			std::cout << "[ENGINE] No instance of resourceManager_ exists, could not shit down resourceManager_ down\n";
 		}
 
-		renderer->Shutdown();
+		if (renderer_) 
+		{
+			renderer_->Shutdown();
+		} else 
+		{
+			std::cout << "[ENGINE] No instance of renderer_ exists, could not shut renderer_ down\n";
+		
+		}
+
 	}
 
 	// Main game loop.
@@ -49,11 +59,11 @@ namespace KYEight
 	}
 	void KYEngine::Render() 
 	{
-		renderer->BeginFrame();
+		renderer_->BeginFrame();
 
-		meshSystem_.Render(registry_, renderer->GetCamera());
+		meshSystem_.Render(registry_, *resourceManager_, renderer_->GetCamera());
 
-		renderer->EndFrame();
+		renderer_->EndFrame();
 
 	}
 
@@ -75,13 +85,19 @@ namespace KYEight
 
 		registry_.Clear();
 	
-		KYDomainConverter::ToRegistry(domain, registry_);
+		resourceManager_->UnloadAll();
+
+		KYDomainConverter::ToRegistry(domain, registry_, *resourceManager_);
 
 		return true;
 	}
 
 
 	// For editor use.
+	KYResourceManager& KYEngine::GetResourceManager() 
+	{
+		return *resourceManager_;
+	}
 	Registry& KYEngine::GetRegistry() 
 	{
 		return registry_;
@@ -92,10 +108,10 @@ namespace KYEight
 	}
 	float KYEngine::GetViewportAspectRatio() const
 	{
-		return renderer->GetAspectRatio();
+		return renderer_->GetAspectRatio();
 	}
 	RenderTexture2D KYEngine::GetViewportTexture() const
 	{
-		return renderer->GetViewportTexture();
+		return renderer_->GetViewportTexture();
 	}
 }

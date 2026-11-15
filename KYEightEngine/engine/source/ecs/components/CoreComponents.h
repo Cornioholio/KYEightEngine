@@ -37,9 +37,11 @@ namespace KYEight
 		int rings_ = 16;
 	};
 
+	using ModelHandle = uint32_t;
+
 	struct MeshComponent 
 	{
-		Model model_{};
+		ModelHandle modelHandle_ = 0;
 		Color colour_ = RED;
 
 		std::optional<PrimitiveMeshData> primitive_;
