@@ -45,6 +45,7 @@ namespace KYEight
 		Color colour_ = RED;
 
 		std::optional<PrimitiveMeshData> primitive_;
+		std::optional<std::string> filepath_;
 	};
 
 	/// <summary>

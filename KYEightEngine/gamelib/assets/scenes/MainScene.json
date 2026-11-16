@@ -1,0 +1,150 @@
+{
+    "entities": [
+        {
+            "mesh": {
+                "colour": [
+                    0,
+                    121,
+                    241,
+                    255
+                ],
+                "filepath": "assets/models/Suzanne.obj",
+                "source": "file"
+            },
+            "name": {
+                "value": "Suzanne"
+            },
+            "transform": {
+                "position": [
+                    2.0999999046325684,
+                    1.0,
+                    3.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "mesh": {
+                "colour": [
+                    230,
+                    41,
+                    55,
+                    255
+                ],
+                "dimensions": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "primitive": "cube",
+                "source": "primitive"
+            },
+            "name": {
+                "value": "Test Cube"
+            },
+            "transform": {
+                "position": [
+                    0.0,
+                    -0.5,
+                    4.300000190734863
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "mesh": {
+                "colour": [
+                    0,
+                    121,
+                    241,
+                    255
+                ],
+                "dimensions": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "primitive": "sphere",
+                "rings": 16,
+                "slices": 16,
+                "source": "primitive"
+            },
+            "name": {
+                "value": "Test Sphere"
+            },
+            "transform": {
+                "position": [
+                    2.0,
+                    1.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "mesh": {
+                "colour": [
+                    0,
+                    228,
+                    48,
+                    255
+                ],
+                "dimensions": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "primitive": "cube",
+                "source": "primitive"
+            },
+            "name": {
+                "value": "Test Cube 2"
+            },
+            "transform": {
+                "position": [
+                    -2.0,
+                    1.0,
+                    -4.300000190734863
+                ],
+                "rotation": [
+                    0.0,
+                    45.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    2.0,
+                    1.0
+                ]
+            }
+        }
+    ],
+    "version": 3
+}

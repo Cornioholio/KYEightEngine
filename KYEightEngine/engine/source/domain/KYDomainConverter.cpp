@@ -10,6 +10,7 @@ namespace KYEight
 		for (Entity entity : registry.GetActiveEntities()) 
 		{
 			KYDomainEntity domainEntity;
+
 			if (registry.HasComponent<NameComponent>(entity)) 
 			{
 				domainEntity.name_ = registry.GetComponent<NameComponent>(entity);
@@ -23,11 +24,19 @@ namespace KYEight
 				const MeshComponent& mesh =
 					registry.GetComponent<MeshComponent>(entity);
 
+				KYDomainMesh domainMesh;
+				domainMesh.colour_ = mesh.colour_;
+
 				if (mesh.primitive_.has_value())
 				{
-					KYDomainMesh domainMesh;
 					domainMesh.primitive_ = *mesh.primitive_;
 					domainMesh.colour_ = mesh.colour_;
+
+					domainEntity.mesh_ = domainMesh;
+				} else if (mesh.filepath_.has_value()) 
+				{
+					domainMesh.source_ = KYDomainMeshSource::File;
+					domainMesh.filepath_ = *mesh.filepath_;
 
 					domainEntity.mesh_ = domainMesh;
 				}
@@ -39,11 +48,32 @@ namespace KYEight
 		return domain;
 	}
 
-	void KYDomainConverter::ToRegistry(const KYDomain& domain, Registry& registry, KYResourceManager& resourceManager)
+	bool KYDomainConverter::ToRegistry(const KYDomain& domain, Registry& registry, KYResourceManager& resourceManager, std::string* error)
 	{
+		if (error != nullptr) 
+		{
+			error->clear();
+		}
+
+		std::vector<Entity> createdEntities;
+		std::vector<ModelHandle> registeredModels;
+		
+		auto cleanup = [&]()
+		{
+			for (Entity entity : createdEntities)
+			{
+				registry.DestroyEntity(entity);
+			}
+			for (ModelHandle handle : registeredModels)
+			{
+				resourceManager.UnloadModel(handle);
+			}
+		};
+
 		for (const KYDomainEntity& domainEntity : domain.entities_) 
 		{
 			Entity entity = registry.CreateEntity();
+			createdEntities.push_back(entity);
 
 			if (domainEntity.name_.has_value()) 
 			{
@@ -58,20 +88,84 @@ namespace KYEight
 			if (domainEntity.mesh_.has_value()) 
 			{
 				const KYDomainMesh& domainMesh = *domainEntity.mesh_;
+				
+				ModelHandle handle = 0;
+
+				if (domainMesh.source_ == KYDomainMeshSource::Primitive) 
+				{
+					Model model = CreatePrimitiveModel(domainMesh.primitive_);
+
+					if (model.meshCount <= 0 || model.meshes == nullptr) 
+					{
+						if (error != nullptr) 
+						{
+							*error = "[ENGINE] Failed to create primitive model\n";
+						}
+
+						cleanup();
+						return false;
+					}
+				
+					handle = resourceManager.RegisterModel(std::move(model));
+					
+					if (handle == 0) 
+					{
+						if (error != nullptr) 
+						{
+							*error = "[ENGINE] Failed to register primitive model\n";
+						}
+
+						cleanup();
+						return false;
+					}
+
+					registeredModels.push_back(handle);
+				}
+				else if (domainMesh.source_ == KYDomainMeshSource::File)
+				{
+					handle = resourceManager.LoadModel(domainMesh.filepath_);
+
+					if (handle == 0)
+					{
+						if (error != nullptr)
+						{
+							*error = "[ENGINE] Failed to load model from file\n";
+						}
+
+						cleanup();
+
+						return false;
+					}
+				} else 
+				{
+					if (error != nullptr) 
+					{
+						*error = "[ENGINE] Unsupported mesh source\n";
+					}
+
+					cleanup();
+					return false;
+				}
 
 				MeshComponent mesh;
-
-				mesh.modelHandle_ = resourceManager.RegisterModel(
-					CreatePrimitiveModel(domainMesh.primitive_)
-				);
-
+				mesh.modelHandle_ = handle;
 				mesh.colour_ = domainMesh.colour_;
 
-				mesh.primitive_ = domainMesh.primitive_;
+				if (domainMesh.source_ == KYDomainMeshSource::Primitive)
+				{
+					mesh.primitive_ = domainMesh.primitive_;
+				}
+				else
+				{
+					mesh.filepath_ = domainMesh.filepath_;
+				}
 
 				registry.AddComponent<MeshComponent>(entity, mesh);
+
 			}
 		}
+
+		return true;
 	}
 
 

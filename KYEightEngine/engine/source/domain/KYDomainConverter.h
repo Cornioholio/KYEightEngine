@@ -13,7 +13,7 @@ namespace KYEight
 	public:
 		static KYDomain FromRegistry(const Registry& registry);
 
-		static void ToRegistry(const KYDomain& domain, Registry& registry, KYResourceManager& resourceManager);
+		static bool ToRegistry(const KYDomain& domain, Registry& registry, KYResourceManager& resourceManager, std::string* error = nullptr);
 
 	private:
 		static Model CreatePrimitiveModel(const PrimitiveMeshData& primitive);

@@ -11,3 +11,7 @@ target_include_directories(KYEightEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/sou
 
 target_link_libraries(KYEightEditor PRIVATE KYEight::Engine KYEight::GameLib KYEightRlImGui)
 
+# Absolute path to the game project source directory
+target_compile_definitions(KYEightEditor PRIVATE
+    KYEIGHT_GAME_PROJECT_DIR="${CMAKE_SOURCE_DIR}/gamelib"
+)

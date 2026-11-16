@@ -378,27 +378,39 @@ void KYEditor::SaveScene()
 {
 	sceneError_.clear();
 
+	const std::filesystem::path scenePath =
+		std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR) / sceneFilepath_;
+
 	std::error_code filesystemError;
 
-	std::filesystem::create_directories(std::filesystem::path(sceneFilepath_).parent_path(), filesystemError);
+	std::filesystem::create_directories(
+		scenePath.parent_path(),
+		filesystemError
+	);
 
-	if (filesystemError) 
+	if (filesystemError)
 	{
-		sceneError_ = "Could not create scene directory: " + filesystemError.message();
+		sceneError_ = "Could not create scene directory: " +
+			filesystemError.message();
 
 		showSceneError_ = true;
-
 		return;
 	}
 
-	if (!engine_->SaveScene(sceneFilepath_, &sceneError_))
+	if (!engine_->SaveScene(scenePath.string(), &sceneError_))
 	{
 		showSceneError_ = true;
+		return;
 	}
+
+	TraceLog(LOG_INFO, "Scene saved: %s", scenePath.string().c_str());
 }
 void KYEditor::LoadScene() 
 {
-	if (!engine_->LoadScene(sceneFilepath_, &sceneError_)) 
+	const std::filesystem::path scenePath =
+		std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR) / sceneFilepath_;
+
+	if (!engine_->LoadScene(scenePath.string(), &sceneError_))
 	{
 		showSceneError_ = true;
 		return;
@@ -431,6 +443,39 @@ void KYEditor::DrawSceneErrorPopup()
 void KYEditor::CreateTestObjects()
 {
 	KYEight::Registry& registry = engine_->GetRegistry();
+
+	// OBJ model
+	KYEight::Entity objcube = registry.CreateEntity();
+	KYEight::NameComponent objcubeName;
+	objcubeName.name_ = "Suzanne";
+
+	KYEight::Transform3D objcubeTransform;
+	objcubeTransform.position_ = { 0.0f, 1.0f, 3.0f };
+	objcubeTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
+	objcubeTransform.scale_ = { 1.0f, 1.0f, 1.0f };
+
+	const std::filesystem::path modelPath =
+		std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR) /
+		"assets/models/Suzanne.obj";
+
+	KYEight::ModelHandle objcubeHandle =
+		engine_->GetResourceManager().LoadModel(modelPath.string());
+
+	if (objcubeHandle != 0)
+	{
+		KYEight::MeshComponent objcubeMesh;
+		objcubeMesh.modelHandle_ = objcubeHandle;
+		objcubeMesh.colour_ = BLUE;
+		objcubeMesh.filepath_ = "assets/models/Suzanne.obj";
+
+		registry.AddComponent<KYEight::NameComponent>(objcube, objcubeName);
+		registry.AddComponent<KYEight::Transform3D>(objcube, objcubeTransform);
+		registry.AddComponent<KYEight::MeshComponent>(objcube, objcubeMesh);
+	}
+	else
+	{
+		registry.DestroyEntity(objcube);
+	}
 
 	// Cube
 	KYEight::Entity cube = registry.CreateEntity();

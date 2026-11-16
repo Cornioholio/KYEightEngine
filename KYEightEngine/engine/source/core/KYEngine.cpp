@@ -84,10 +84,12 @@ namespace KYEight
 		}
 
 		registry_.Clear();
-	
 		resourceManager_->UnloadAll();
 
-		KYDomainConverter::ToRegistry(domain, registry_, *resourceManager_);
+		if (!KYDomainConverter::ToRegistry(domain, registry_, *resourceManager_))
+		{
+			return false;
+		}
 
 		return true;
 	}

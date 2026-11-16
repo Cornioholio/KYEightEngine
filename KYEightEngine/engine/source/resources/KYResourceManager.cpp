@@ -9,6 +9,18 @@ namespace KYEight
 
 	ModelHandle KYResourceManager::LoadModel(const std::string& filepath)
 	{
+		if (filepath.empty()) 
+		{
+			return 0;
+		}
+
+		auto iterator = modelPaths_.find(filepath);
+
+		if (iterator != modelPaths_.end()) 
+		{
+			return iterator->second;
+		}
+
 		Model model = ::LoadModel(filepath.c_str());
 
 		if (model.meshCount <= 0 || model.meshes == nullptr)
@@ -16,7 +28,16 @@ namespace KYEight
 			return 0;
 		}
 
-		return RegisterModel(std::move(model));
+		ModelHandle handle = RegisterModel(std::move(model));
+
+		if (handle == 0) 
+		{
+			return 0;
+		}
+
+		modelPaths_.emplace(filepath, handle);
+
+		return handle;
 	}
 	ModelHandle KYResourceManager::RegisterModel(Model&& model)
 	{
@@ -51,6 +72,7 @@ namespace KYEight
 		}
 
 		models_.clear();
+		modelPaths_.clear();
 	}
 	void KYResourceManager::UnloadModel(ModelHandle handle)
 	{
@@ -64,6 +86,17 @@ namespace KYEight
 		::UnloadModel(iterator->second);
 
 		models_.erase(iterator);
+
+		for (auto pathIterator = modelPaths_.begin(); pathIterator != modelPaths_.end();) 
+		{
+			if (pathIterator->second == handle) 
+			{
+				pathIterator = modelPaths_.erase(pathIterator);
+			} else 
+			{
+				++pathIterator;
+			}
+		}
 	}
 
 	void KYResourceManager::Shutdown()

@@ -107,7 +107,7 @@ namespace KYEightEditor
 		const char* editorWindowTitle_ = "Choaklit creem";
 
 		//Scene configuration
-		std::string sceneFilepath_ = "domains/CurrentScene.json";
+		std::string sceneFilepath_ = "assets/scenes/MainScene.json";
 		std::string sceneError_;
 		bool showSceneError_ = false;
 	};

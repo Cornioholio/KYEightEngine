@@ -11,7 +11,7 @@ namespace KYEight
 		~KYResourceManager();
 
 		KYResourceManager(const KYResourceManager&) = delete;
-		KYResourceManager& operator=(const KYResourceManager) = delete;
+		KYResourceManager& operator=(const KYResourceManager&) = delete;
 
 		ModelHandle LoadModel(const std::string& filepath);
 		ModelHandle RegisterModel(Model&& model);
@@ -24,6 +24,8 @@ namespace KYEight
 
 	private:
 		std::unordered_map<ModelHandle, Model> models_;
+		std::unordered_map<std::string, ModelHandle> modelPaths_;
+
 		ModelHandle nextHandle_ = 1;
 
 	};

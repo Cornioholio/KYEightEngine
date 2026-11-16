@@ -7,9 +7,16 @@
 
 namespace KYEight 
 {
+	enum class KYDomainMeshSource
+	{
+		Primitive,
+		File
+	};
 	struct KYDomainMesh
 	{
+		KYDomainMeshSource source_ = KYDomainMeshSource::Primitive;
 		PrimitiveMeshData primitive_;
+		std::string filepath_ = "";
 		Color colour_ = RED;
 	};
 
@@ -28,7 +35,7 @@ namespace KYEight
 	/// </summary>
 	struct KYDomain 
 	{
-		static constexpr int currentVersion_ = 2;
+		static constexpr int currentVersion_ = 3;
 
 		std::vector<KYDomainEntity> entities_;
 	};
