@@ -32,6 +32,9 @@ namespace KYEight
 
 				if (model == nullptr) 
 				{
+					TraceLog(LOG_WARNING,
+						"MeshSystem: Failed to retrieve model for entity %u. Handle: %u",
+						entity, mesh.modelHandle_);
 					continue;
 				}
 
