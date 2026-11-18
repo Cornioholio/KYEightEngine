@@ -8,6 +8,9 @@
 // Entities
 #include "ecs/Entity.h"
 
+// Panels
+#include "panels/AssetBrowser.h"
+
 #include <memory>
 #include <filesystem>
 
@@ -100,6 +103,9 @@ namespace KYEightEditor
 		KYEight::ViewportTarget viewportTarget_;
 		std::unique_ptr<KYEight::KYEngine> engine_ = nullptr;
 		PlaySession playSession_;
+
+		// Panels
+		AssetBrowser assetBrowser_;
 
 		// Editor viewport confiuration
 		const unsigned int editorWindowHeight_ = 1080;
