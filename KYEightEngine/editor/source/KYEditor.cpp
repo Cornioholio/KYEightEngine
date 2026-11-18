@@ -241,10 +241,6 @@ namespace KYEightEditor
 		ImGui::Button("Pause");
 
 		ImGui::SameLine();
-
-		ImGui::Button("Step");
-
-		ImGui::SameLine();
 		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 		ImGui::SameLine();
 
