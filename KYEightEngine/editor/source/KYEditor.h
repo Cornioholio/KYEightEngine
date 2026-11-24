@@ -110,7 +110,7 @@ namespace KYEightEditor
 		// Editor viewport confiuration
 		const unsigned int editorWindowHeight_ = 1080;
 		const unsigned int editorWindowWidth_ = 1920;
-		const char* editorWindowTitle_ = "Choaklit creem";
+		const char* editorWindowTitle_ = "KYEightEditor - Try Unity!";
 
 		//Scene configuration
 		std::string sceneFilepath_ = "assets/scenes/MainScene.json";

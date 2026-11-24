@@ -16,7 +16,7 @@ namespace KYEightEditor
 
 	KYEditor::KYEditor() 
 		: viewportTarget_(1280, 720), 
-		assetBrowser_(std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR) / "assets")
+		assetBrowser_(std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR))
 	{
 		engine_ = std::make_unique<KYEight::KYEngine>(viewportTarget_);
 	}

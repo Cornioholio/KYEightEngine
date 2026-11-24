@@ -96,6 +96,7 @@ namespace KYEightEditor
 	void AssetBrowser::Draw() 
 	{
 		// Navigation controls
+
 		if (currentPath_ != rootPath_) 
 		{
 			if (ImGui::Button("Back")) 
@@ -127,6 +128,8 @@ namespace KYEightEditor
 		}
 
 		// Asset grid
+		std::filesystem::path pendingNavigation;
+
 		if (ImGui::BeginTable("AssetGrid", 4, ImGuiTableFlags_SizingStretchSame)) 
 		{
 			int column = 0;
@@ -164,7 +167,7 @@ namespace KYEightEditor
 					if (asset.isDirectory_ &&
 						ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) 
 					{
-						NavigateTo(asset.filepath_);
+						pendingNavigation = asset.filepath_;
 					} else 
 					{
 						selectedAsset_ = asset.filepath_;
@@ -177,6 +180,11 @@ namespace KYEightEditor
 			}
 
 			ImGui::EndTable();
+		}
+
+		if (!pendingNavigation.empty()) 
+		{
+			NavigateTo(pendingNavigation);
 		}
 
 		ImGui::Separator();

@@ -8,7 +8,7 @@ add_executable(KYEightEditor
 
 # Absolute path to the game project source directory
 target_compile_definitions(KYEightEditor PRIVATE
-    KYEIGHT_GAME_PROJECT_DIR="${CMAKE_SOURCE_DIR}/gamelib"
+    KYEIGHT_GAME_PROJECT_DIR="${CMAKE_SOURCE_DIR}/gamelib/game"
 )
 
 target_compile_features(KYEightEditor PRIVATE cxx_std_20)
@@ -19,7 +19,7 @@ target_link_libraries(KYEightEditor PRIVATE KYEight::Engine KYEight::GameLib KYE
 
 add_custom_target(KYEightEditorAssets ALL
 	COMMAND ${CMAKE_COMMAND} -E copy_directory 
-		"${CMAKE_SOURCE_DIR}/gamelib/assets"
+		"${CMAKE_SOURCE_DIR}/gamelib/game"
 		"$<TARGET_FILE_DIR:KYEightEditor>/assets"
 	VERBATIM)
 
