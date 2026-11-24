@@ -17,3 +17,10 @@ target_include_directories(KYEightEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/sou
 
 target_link_libraries(KYEightEditor PRIVATE KYEight::Engine KYEight::GameLib KYEightRlImGui)
 
+add_custom_target(KYEightEditorAssets ALL
+	COMMAND ${CMAKE_COMMAND} -E copy_directory 
+		"${CMAKE_SOURCE_DIR}/gamelib/assets"
+		"$<TARGET_FILE_DIR:KYEightEditor>/assets"
+	VERBATIM)
+
+add_dependencies(KYEightEditor KYEightEditorAssets)

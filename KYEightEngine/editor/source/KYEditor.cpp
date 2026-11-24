@@ -452,9 +452,7 @@ namespace KYEightEditor
 		objcubeTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
 		objcubeTransform.scale_ = { 1.0f, 1.0f, 1.0f };
 
-		const std::filesystem::path modelPath =
-			std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR) /
-			"assets/models/Suzanne.obj";
+		const std::filesystem::path modelPath =	"assets/models/Suzanne.obj";
 
 		KYEight::ModelHandle objcubeHandle =
 			engine_->GetResourceManager().LoadModel(modelPath.string());
