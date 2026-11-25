@@ -16,7 +16,8 @@ namespace KYEightEditor
 
 	KYEditor::KYEditor() 
 		: viewportTarget_(1280, 720), 
-		assetBrowser_(std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR))
+		assetBrowser_(std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR)),
+		entityInspector_(std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR))
 	{
 		engine_ = std::make_unique<KYEight::KYEngine>(viewportTarget_);
 	}
@@ -39,8 +40,6 @@ namespace KYEightEditor
 		{
 			return false;
 		}
-
-		CreateTestObjects();
 
 		// Start setup for raylib/imgui connection
 		rlImGuiSetup(true);
@@ -265,27 +264,6 @@ namespace KYEightEditor
 	{
 		sceneHierarchy_.Draw(engine_->GetRegistry(), selectedEntity_);
 	}
-	void KYEditor::DrawTransforms(KYEight::Entity entity) 
-	{
-		KYEight::Registry& registry = engine_->GetRegistry();
-
-		if (!registry.HasComponent<KYEight::Transform3D>(entity))
-		{
-			return;
-		}
-
-		KYEight::Transform3D& transform = registry.GetComponent<KYEight::Transform3D>(entity);
-
-		if (!ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			return;
-		}
-
-		ImGui::DragFloat3("Position", &transform.position_.x, 0.1f);
-		ImGui::DragFloat3("Rotation", &transform.rotation_.x, 0.1f);
-		ImGui::DragFloat3("Scale", &transform.scale_.x, 0.1f);
-
-	}
 	void KYEditor::DrawBottomPanel()
 	{
 		ImGui::Begin("File Explorer");
@@ -319,35 +297,12 @@ namespace KYEightEditor
 	}
 	void KYEditor::DrawInspector()
 	{
-		ImGui::Begin("Inspector");
-
-		KYEight::Registry& registry = engine_->GetRegistry();
-
-		// No valid selection
-		if (!registry.IsValid(selectedEntity_))
+		if (engine_ == nullptr) 
 		{
-			selectedEntity_ = KYEight::NullEntity;
-			ImGui::TextDisabled("No entity selected");
-
-			ImGui::End();
 			return;
 		}
 
-		// Display entity name
-		if (registry.HasComponent<KYEight::NameComponent>(selectedEntity_))
-		{
-			const auto& name =
-				registry.GetComponent<KYEight::NameComponent>(selectedEntity_);
-
-			ImGui::Text("%s", name.name_.c_str());
-		}
-
-		ImGui::Separator();
-
-		// Display available entity properties
-		DrawTransforms(selectedEntity_);
-
-		ImGui::End();
+		entityInspector_.Draw(engine_->GetRegistry(), selectedEntity_, engine_->GetResourceManager());
 	}
 	// Scene stuff
 	void KYEditor::SaveScene() 
@@ -416,125 +371,5 @@ namespace KYEightEditor
 			ImGui::EndPopup();
 		}
 
-	}
-	void KYEditor::CreateTestObjects()
-	{
-		KYEight::Registry& registry = engine_->GetRegistry();
-
-		// OBJ model
-		KYEight::Entity objcube = registry.CreateEntity();
-		KYEight::NameComponent objcubeName;
-		objcubeName.name_ = "Suzanne";
-
-		KYEight::Transform3D objcubeTransform;
-		objcubeTransform.position_ = { 0.0f, 1.0f, 3.0f };
-		objcubeTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
-		objcubeTransform.scale_ = { 1.0f, 1.0f, 1.0f };
-
-		const std::filesystem::path modelPath =	"assets/models/Suzanne.obj";
-
-		KYEight::ModelHandle objcubeHandle =
-			engine_->GetResourceManager().LoadModel(modelPath.string());
-
-		if (objcubeHandle != 0)
-		{
-			KYEight::MeshComponent objcubeMesh;
-			objcubeMesh.modelHandle_ = objcubeHandle;
-			objcubeMesh.colour_ = BLUE;
-			objcubeMesh.filepath_ = "assets/models/Suzanne.obj";
-
-			registry.AddComponent<KYEight::NameComponent>(objcube, objcubeName);
-			registry.AddComponent<KYEight::Transform3D>(objcube, objcubeTransform);
-			registry.AddComponent<KYEight::MeshComponent>(objcube, objcubeMesh);
-		}
-		else
-		{
-			registry.DestroyEntity(objcube);
-		}
-
-		// Cube
-		KYEight::Entity cube = registry.CreateEntity();
-
-		KYEight::NameComponent cubeName;
-		cubeName.name_ = "Test Cube";
-
-		KYEight::Transform3D cubeTransform;
-		cubeTransform.position_ = { 0.0f, 1.0f, 0.0f };
-		cubeTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
-		cubeTransform.scale_ = { 1.0f, 1.0f, 1.0f };
-
-		KYEight::MeshComponent cubeMesh;
-		cubeMesh.modelHandle_ = engine_->GetResourceManager().RegisterModel(
-			LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f))
-		);
-		cubeMesh.colour_ = RED;
-
-		KYEight::PrimitiveMeshData cubePrimitive;
-		cubePrimitive.type_ = KYEight::MeshPrimitive::Cube;
-		cubePrimitive.dimensions_ = { 1.0f, 1.0f, 1.0f };
-
-		cubeMesh.primitive_ = cubePrimitive;
-
-		registry.AddComponent<KYEight::NameComponent>(cube, cubeName);
-		registry.AddComponent<KYEight::Transform3D>(cube, cubeTransform);
-		registry.AddComponent<KYEight::MeshComponent>(cube, cubeMesh);
-
-
-		// Sphere
-		KYEight::Entity sphere = registry.CreateEntity();
-
-		KYEight::NameComponent sphereName;
-		sphereName.name_ = "Test Sphere";
-
-		KYEight::Transform3D sphereTransform;
-		sphereTransform.position_ = { 2.0f, 1.0f, 0.0f };
-		sphereTransform.rotation_ = { 0.0f, 0.0f, 0.0f };
-		sphereTransform.scale_ = { 1.0f, 1.0f, 1.0f };
-
-		KYEight::MeshComponent sphereMesh;
-		sphereMesh.modelHandle_ = engine_->GetResourceManager().RegisterModel(
-			LoadModelFromMesh(GenMeshSphere(0.5f, 16, 16))
-		);
-		sphereMesh.colour_ = BLUE;
-
-		KYEight::PrimitiveMeshData spherePrimitive;
-		spherePrimitive.type_ = KYEight::MeshPrimitive::Sphere;
-		spherePrimitive.dimensions_ = { 0.5f, 0.5f, 0.5f };
-		spherePrimitive.slices_ = 16;
-		spherePrimitive.rings_ = 16;
-
-		sphereMesh.primitive_ = spherePrimitive;
-
-		registry.AddComponent<KYEight::NameComponent>(sphere, sphereName);
-		registry.AddComponent<KYEight::Transform3D>(sphere, sphereTransform);
-		registry.AddComponent<KYEight::MeshComponent>(sphere, sphereMesh);
-
-
-		// Second cube, with a different transform
-		KYEight::Entity secondCube = registry.CreateEntity();
-
-		KYEight::NameComponent secondCubeName;
-		secondCubeName.name_ = "Test Cube 2";
-
-		KYEight::Transform3D secondCubeTransform;
-		secondCubeTransform.position_ = { -2.0f, 1.0f, 0.0f };
-		secondCubeTransform.rotation_ = { 0.0f, 45.0f, 0.0f };
-		secondCubeTransform.scale_ = { 1.0f, 2.0f, 1.0f };
-
-		KYEight::MeshComponent secondCubeMesh;
-		secondCubeMesh.modelHandle_ = engine_->GetResourceManager().RegisterModel(
-			LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f))
-		);
-		secondCubeMesh.colour_ = GREEN;
-
-		KYEight::PrimitiveMeshData secondCubePrimitive;
-		secondCubePrimitive.type_ = KYEight::MeshPrimitive::Cube;
-		secondCubePrimitive.dimensions_ = { 1.0f, 1.0f, 1.0f };
-
-		secondCubeMesh.primitive_ = secondCubePrimitive;
-
-		registry.AddComponent<KYEight::NameComponent>(secondCube, secondCubeName);
-		registry.AddComponent<KYEight::Transform3D>(secondCube, secondCubeTransform);
-		registry.AddComponent<KYEight::MeshComponent>(secondCube, secondCubeMesh);
 	}
 }

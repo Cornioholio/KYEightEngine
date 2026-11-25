@@ -11,6 +11,7 @@
 // Panels
 #include "panels/AssetBrowser.h"
 #include "panels/SceneHierarchy.h"
+#include "panels/Inspector.h"
 
 #include <memory>
 #include <filesystem>
@@ -86,17 +87,11 @@ namespace KYEightEditor
 		void DrawFiles();
 		void DrawConsole();
 
-		// Inspector possible entity properties
-		void DrawTransforms(KYEight::Entity entity);
-
 		// Scene Tools
 		void SaveScene();
 		void LoadScene();
 		void DrawSceneErrorPopup();
 
-		// Testing
-		void CreateTestObjects();
-		
 		// Editor state
 		KYEight::Entity selectedEntity_ = KYEight::NullEntity;
 
@@ -108,6 +103,7 @@ namespace KYEightEditor
 		// Panels
 		AssetBrowser assetBrowser_;
 		SceneHierarchy sceneHierarchy_;
+		Inspector entityInspector_;
 
 		// Editor viewport confiuration
 		const unsigned int editorWindowHeight_ = 1080;

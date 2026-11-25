@@ -12,7 +12,7 @@ target_link_libraries(KYGame PRIVATE KYEight::GameLib)
 # Stage game assets alongside the standalone game executable on every build
 add_custom_target(KYGameAssets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/gamelib/assets"
+        "${CMAKE_SOURCE_DIR}/gamelib/game/assets"
         "$<TARGET_FILE_DIR:KYGame>/assets"
     VERBATIM
 )

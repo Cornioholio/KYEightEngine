@@ -5,6 +5,7 @@ add_executable(KYEightEditor
 	source/PlaySession.cpp
 	source/panels/AssetBrowser.cpp
 	source/panels/SceneHierarchy.cpp
+	source/panels/Inspector.cpp
 )
 
 # Absolute path to the game project source directory
@@ -20,7 +21,7 @@ target_link_libraries(KYEightEditor PRIVATE KYEight::Engine KYEight::GameLib KYE
 
 add_custom_target(KYEightEditorAssets ALL
 	COMMAND ${CMAKE_COMMAND} -E copy_directory 
-		"${CMAKE_SOURCE_DIR}/gamelib/game"
+		"${CMAKE_SOURCE_DIR}/gamelib/game/assets"
 		"$<TARGET_FILE_DIR:KYEightEditor>/assets"
 	VERBATIM)
 
