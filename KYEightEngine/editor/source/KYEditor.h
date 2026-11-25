@@ -10,6 +10,7 @@
 
 // Panels
 #include "panels/AssetBrowser.h"
+#include "panels/SceneHierarchy.h"
 
 #include <memory>
 #include <filesystem>
@@ -106,6 +107,7 @@ namespace KYEightEditor
 
 		// Panels
 		AssetBrowser assetBrowser_;
+		SceneHierarchy sceneHierarchy_;
 
 		// Editor viewport confiuration
 		const unsigned int editorWindowHeight_ = 1080;

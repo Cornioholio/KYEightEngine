@@ -4,6 +4,7 @@ add_executable(KYEightEditor
 	source/KYEditor.cpp
 	source/PlaySession.cpp
 	source/panels/AssetBrowser.cpp
+	source/panels/SceneHierarchy.cpp
 )
 
 # Absolute path to the game project source directory

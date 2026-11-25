@@ -263,60 +263,7 @@ namespace KYEightEditor
 	}
 	void KYEditor::DrawSceneHierarchy()
 	{
-		ImGui::Begin("Objects");
-
-		ImGui::Text("Scene");
-		ImGui::Separator();
-
-		const KYEight::Registry& registry = engine_->GetRegistry();
-
-		for (KYEight::Entity entity : registry.GetActiveEntities()) 
-		{
-			// Only named entities are displayed in the hierarchy
-			if (!registry.HasComponent<KYEight::NameComponent>(entity)) 
-			{
-				continue;
-			}
-
-			const KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(entity);
-
-			const bool selected = selectedEntity_ == entity;
-
-			if (ImGui::Selectable(name.name_.c_str(), selected)) 
-			{
-				selectedEntity_ = entity;
-			}
-		}
-
-		ImGui::End();
-	}
-	void KYEditor::DrawInspector()
-	{
-		ImGui::Begin("Inspector");
-
-		KYEight::Registry& registry = engine_->GetRegistry();
-
-		if (!registry.IsValid(selectedEntity_) ||
-			!registry.HasComponent<KYEight::NameComponent>(selectedEntity_)) 
-		{
-			selectedEntity_ = KYEight::NullEntity;
-
-			ImGui::Text("No entity selected");
-			ImGui::End();
-
-			return;
-		}
-
-		// Display name of entity
-		KYEight::NameComponent& name = registry.GetComponent<KYEight::NameComponent>(selectedEntity_);
-		ImGui::Text("%s", name.name_.c_str());
-
-		ImGui::Separator();
-
-		// Draw entity properties
-		DrawTransforms(selectedEntity_);
-
-		ImGui::End();
+		sceneHierarchy_.Draw(engine_->GetRegistry(), selectedEntity_);
 	}
 	void KYEditor::DrawTransforms(KYEight::Entity entity) 
 	{
@@ -370,7 +317,38 @@ namespace KYEightEditor
 	{
 
 	}
+	void KYEditor::DrawInspector()
+	{
+		ImGui::Begin("Inspector");
 
+		KYEight::Registry& registry = engine_->GetRegistry();
+
+		// No valid selection
+		if (!registry.IsValid(selectedEntity_))
+		{
+			selectedEntity_ = KYEight::NullEntity;
+			ImGui::TextDisabled("No entity selected");
+
+			ImGui::End();
+			return;
+		}
+
+		// Display entity name
+		if (registry.HasComponent<KYEight::NameComponent>(selectedEntity_))
+		{
+			const auto& name =
+				registry.GetComponent<KYEight::NameComponent>(selectedEntity_);
+
+			ImGui::Text("%s", name.name_.c_str());
+		}
+
+		ImGui::Separator();
+
+		// Display available entity properties
+		DrawTransforms(selectedEntity_);
+
+		ImGui::End();
+	}
 	// Scene stuff
 	void KYEditor::SaveScene() 
 	{
@@ -403,6 +381,7 @@ namespace KYEightEditor
 
 		TraceLog(LOG_INFO, "Scene saved: %s", scenePath.string().c_str());
 	}
+
 	void KYEditor::LoadScene() 
 	{
 		const std::filesystem::path scenePath =
