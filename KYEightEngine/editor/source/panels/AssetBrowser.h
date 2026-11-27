@@ -11,6 +11,13 @@ namespace KYEightEditor
 		explicit AssetBrowser(const std::filesystem::path& assetRoot);
 
 		void Draw();
+
+		const std::filesystem::path& GetSelectedAsset() const;
+		const std::filesystem::path& GetCurrentPath() const;
+
+		void SelectAsset(const std::filesystem::path& filepath);
+		void Refresh();
+
 	private:
 		struct AssetEntry 
 		{

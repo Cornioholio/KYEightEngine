@@ -89,8 +89,12 @@ namespace KYEightEditor
 
 		// Scene Tools
 		void SaveScene();
+		void SaveSceneAs();
 		void LoadScene();
+		void DrawSaveAsPopup();
 		void DrawSceneErrorPopup();
+
+		char saveSceneName_[128] = "NewScene.json";
 
 		// Editor state
 		KYEight::Entity selectedEntity_ = KYEight::NullEntity;

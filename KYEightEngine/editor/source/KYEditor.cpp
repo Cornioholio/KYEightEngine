@@ -252,11 +252,27 @@ namespace KYEightEditor
 
 			ImGui::SameLine();
 
+			const std::filesystem::path& selectedAsset = assetBrowser_.GetSelectedAsset();
+			const bool canLoadScene = !selectedAsset.empty() && selectedAsset.extension() == ".json" && std::filesystem::is_regular_file(selectedAsset);
+
+			ImGui::BeginDisabled(!canLoadScene);
+
 			if (ImGui::Button("Load Scene"))
 			{
 				LoadScene();
 			}
+
+			ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Save As")) 
+			{
+				ImGui::OpenPopup("Save Scene As");
+			}
 		}
+
+		DrawSaveAsPopup();
 
 		ImGui::End();
 	}
@@ -336,11 +352,101 @@ namespace KYEightEditor
 
 		TraceLog(LOG_INFO, "Scene saved: %s", scenePath.string().c_str());
 	}
+	void KYEditor::SaveSceneAs() 
+	{
+		sceneError_.clear();
 
+		std::string filename = saveSceneName_;
+
+		if (filename.empty()) 
+		{
+			sceneError_ = "Please enter a scene filename.";
+			showSceneError_ = true;
+			return;
+		}
+
+		std::filesystem::path filenamePath(filename);
+
+		// Only allow a filename, not a dir path
+
+		if (filenamePath.has_parent_path() ||
+			filenamePath.filename() != filenamePath) 
+		{
+			sceneError_ = "Invalid scene filename.";
+			showSceneError_ = true;
+			return;
+		}
+
+		// Add JSON extension if it was not supplied
+		if (filenamePath.extension().empty()) 
+		{
+			filenamePath += ".json";
+		} else if (filenamePath.extension() != ".json")
+		{
+			sceneError_ = "Scene file must use the .json extension.";
+			showSceneError_ = true;
+			return;
+		}
+
+		// Save into the currently displayed asset browser directory.
+		const std::filesystem::path scenePath = assetBrowser_.GetCurrentPath() / filenamePath;
+
+		std::error_code filesystemError;
+
+		// Do not overwrite an existing scene
+		if (std::filesystem::exists(scenePath, filesystemError))
+		{
+			sceneError_ = "A file with that name already exists";
+			showSceneError_ = true;
+
+			return;
+		}
+
+		if (filesystemError) 
+		{
+			sceneError_ = "Could not check destination: " + filesystemError.message();
+			showSceneError_ = true;
+			return;
+		}
+
+		if (!engine_->SaveScene(scenePath.string(), &sceneError_)) 
+		{
+			showSceneError_ = true;
+			return;
+		}
+			
+		// Make new scene the currently active scene
+		sceneFilepath_ = scenePath.lexically_relative(std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR)).generic_string();
+
+		assetBrowser_.Refresh();
+		assetBrowser_.SelectAsset(scenePath);
+
+		TraceLog(LOG_INFO, "New scene saved: %s", scenePath.string().c_str());
+
+		ImGui::CloseCurrentPopup();
+	}
 	void KYEditor::LoadScene() 
 	{
+		sceneError_.clear();
+
 		const std::filesystem::path scenePath =
-			std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR) / sceneFilepath_;
+			assetBrowser_.GetSelectedAsset();
+
+		if (scenePath.empty() || scenePath.extension() != ".json")
+		{
+			sceneError_ = "Please select a valid JSON scene file.";
+			showSceneError_ = true;
+			return;
+		}
+
+		std::error_code filesystemError;
+
+		if (!std::filesystem::is_regular_file(scenePath, filesystemError))
+		{
+			sceneError_ = "Selected scene file does not exist.";
+			showSceneError_ = true;
+			return;
+		}
 
 		if (!engine_->LoadScene(scenePath.string(), &sceneError_))
 		{
@@ -348,7 +454,36 @@ namespace KYEightEditor
 			return;
 		}
 
+		// Update the active scene path after a successful load.
+		sceneFilepath_ = scenePath.lexically_relative(
+			std::filesystem::path(KYEIGHT_GAME_PROJECT_DIR)
+		).generic_string();
+
 		selectedEntity_ = KYEight::NullEntity;
+
+		TraceLog(LOG_INFO, "Scene loaded: %s", scenePath.string().c_str());
+	}
+	void KYEditor::DrawSaveAsPopup() 
+	{
+		if (ImGui::BeginPopupModal("Save Scene As", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) 
+		{
+			ImGui::Text("Enter new name:");
+			ImGui::InputText("Filename", saveSceneName_, sizeof(saveSceneName_));
+
+			if (ImGui::Button("Save")) 
+			{
+				SaveSceneAs();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel")) 
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
 	}
 	void KYEditor::DrawSceneErrorPopup() 
 	{

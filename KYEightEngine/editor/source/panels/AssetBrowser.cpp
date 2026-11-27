@@ -210,6 +210,23 @@
 					selectedAsset_.filename().string().c_str());
 			}
 		}
+		const std::filesystem::path& AssetBrowser::GetSelectedAsset() const
+		{
+			return selectedAsset_;
+		}
+		const std::filesystem::path& AssetBrowser::GetCurrentPath() const
+		{
+			return currentPath_;
+		}
+
+		void AssetBrowser::SelectAsset(const std::filesystem::path& filepath)
+		{
+			selectedAsset_ = filepath;
+		}
+		void AssetBrowser::Refresh()
+		{
+			RefreshDirectory();
+		}
 
 		void AssetBrowser::ImportFile() 
 		{
