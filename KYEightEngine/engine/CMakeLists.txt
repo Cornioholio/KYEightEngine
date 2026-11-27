@@ -12,7 +12,7 @@ add_library(KYEightEngine STATIC
 	source/renderer/ViewportTarget.cpp
 	source/renderer/WindowTarget.cpp
 	# Resources
-	source/resources/KYResourceManager.cpp)
+	source/resources/KYResourceManager.cpp  )
 
 add_library(KYEight::Engine ALIAS KYEightEngine)
 
@@ -22,5 +22,3 @@ target_include_directories(KYEightEngine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURREN
 # Public because engine headers expose raylib types
 target_link_libraries(KYEightEngine PUBLIC raylib)
 target_link_libraries(KYEightEngine PRIVATE nlohmann_json)
-
-# Add jolt when used

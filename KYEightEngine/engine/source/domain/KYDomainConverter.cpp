@@ -41,6 +41,10 @@ namespace KYEight
 					domainEntity.mesh_ = domainMesh;
 				}
 			}
+			if (registry.HasComponent<DirectionalLight>(entity)) 
+			{
+				domainEntity.directionalLight_ = registry.GetComponent<DirectionalLight>(entity);
+			}
 
 			domain.entities_.push_back(domainEntity);
 		}
@@ -162,6 +166,22 @@ namespace KYEight
 
 				registry.AddComponent<MeshComponent>(entity, mesh);
 
+			}
+
+			if (domainEntity.directionalLight_.has_value()) 
+			{
+				if (registry.HasComponent<MeshComponent>(entity)) 
+				{
+					if (error != nullptr) 
+					{
+						*error = "[ENGINE] Entity cannot have both mesh component and directional light\n";
+					}
+
+					cleanup();
+					return false;
+				}
+
+				registry.AddComponent<DirectionalLight>(entity, *domainEntity.directionalLight_);
 			}
 		}
 

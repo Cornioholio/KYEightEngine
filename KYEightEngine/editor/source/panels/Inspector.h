@@ -25,6 +25,7 @@ namespace KYEightEditor
 		void DrawName(KYEight::Registry& registry, KYEight::Entity entity);
 		void DrawTransform(KYEight::Registry& registrty, KYEight::Entity entity);
 		void DrawMesh(KYEight::Registry& registry, KYEight::Entity entity, KYEight::KYResourceManager& resourceManager);
+		void DrawDirectionalLight(KYEight::Registry& registry, KYEight::Entity entity);
 
 		void RefreshMeshAssets();
 

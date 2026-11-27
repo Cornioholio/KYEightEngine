@@ -56,4 +56,12 @@ namespace KYEight
 		std::string name_ = "";
 	};
 
+	/// <summary>
+	/// Directional light source
+	/// </summary>
+	struct DirectionalLight 
+	{
+		Color colour_ = WHITE;
+		float intensity_ = 1.0f;
+	};
 }

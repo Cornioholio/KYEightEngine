@@ -34,12 +34,13 @@ namespace KYEight
 		// Editor access
 		float GetAspectRatio() const;
 		RenderTexture2D GetViewportTexture() const;
+		const Shader& GetLightingShader() const;
 
 	private:
-		void RenderScene();
-
 		RenderTarget& renderTarget_;
 
+		Shader lightingShader_{};
+		bool lightingShaderLoaded_ = false;
 		Camera3D camera_{};
 	};
 }

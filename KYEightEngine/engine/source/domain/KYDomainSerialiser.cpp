@@ -372,6 +372,38 @@ namespace KYEight
 					
 					savedEntity["mesh"] = std::move(savedMesh);
 				}
+				if (entity.directionalLight_.has_value())
+				{
+					if (entity.mesh_.has_value())
+					{
+						SetError(error, "Cannot save: entity cannot contain both mesh and directional light components");
+
+						return false;
+					}
+
+					const DirectionalLight& light = *entity.directionalLight_;
+
+					if (!std::isfinite(light.intensity_) || light.intensity_ < 0.f)
+					{
+						SetError(error, "Cannot save scene: invalid directional light intensity.");
+
+						return false;
+					}
+
+					savedEntity["directionalLight"] =
+					{
+						{
+							"colour",
+							{
+								light.colour_.r,
+								light.colour_.g,
+								light.colour_.b,
+								light.colour_.a
+							}
+						},
+						{"intensity", light.intensity_}
+					};
+				}
 
 				document["entities"].push_back(std::move(savedEntity));
 			}
@@ -450,7 +482,7 @@ namespace KYEight
 
 			const int version = versionIterator->get<int>();
 
-			if (version != KYDomain::currentVersion_)
+			if (version < 3|| version > KYDomain::currentVersion_)
 			{
 				SetError(
 					error,
@@ -569,6 +601,60 @@ namespace KYEight
 
 					entity.mesh_ = mesh;
 				}
+
+				const auto lightIterator = savedEntity.find("directionalLight");
+
+				if (lightIterator != savedEntity.end()) 
+				{
+					if (savedEntity.contains("mesh")) 
+					{
+						SetError(error, entityDescription + ": entity cannot contain both mesh and directional light components.");
+
+						return false;
+					}
+
+					if (!lightIterator->is_object()) 
+					{
+						SetError(error, entityDescription + ": directional light must be an object.");
+
+						return false;
+					}
+
+					DirectionalLight light;
+
+					const auto colourIterator = lightIterator->find("colour");
+
+					if (colourIterator == lightIterator->end() ||
+						!ReadColour(*colourIterator, light.colour_, entityDescription, error)) 
+					{
+						return false;
+					}
+
+					const auto intensityIterator = lightIterator->find("intensity");
+
+					if (intensityIterator == lightIterator->end() ||
+						!intensityIterator->is_number()) 
+					{
+						SetError(error, entityDescription + ": missing or invalid light intensity");
+						return false;
+					}
+
+					const double intensity = intensityIterator->get<double>();
+
+					if (!std::isfinite(intensity) ||
+						intensity < 0.0 ||
+						intensity > std::numeric_limits<float>::max()) 
+					{
+						SetError(error, entityDescription + ": invalid light intensity.");
+
+						return false;
+					}
+
+					light.intensity_ = static_cast<float>(intensity);
+
+					entity.directionalLight_ = light;
+				}
+
 
 				loadedDomain.entities_.push_back(std::move(entity));
 			}

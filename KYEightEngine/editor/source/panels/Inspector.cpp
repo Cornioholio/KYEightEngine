@@ -38,6 +38,10 @@ namespace KYEightEditor
 
 		ImGui::Separator();
 
+		DrawDirectionalLight(registry, selectedEntity);
+
+		ImGui::Separator();
+
 		DrawMesh(registry, selectedEntity, resourceManager);
 
 		ImGui::End();
@@ -88,6 +92,11 @@ namespace KYEightEditor
 	{
 		if (!registry.HasComponent<KYEight::MeshComponent>(entity)) 
 		{
+			if (registry.HasComponent<KYEight::DirectionalLight>(entity)) 
+			{
+				return;
+			}
+
 			if (ImGui::Button("Add Mesh Component")) 
 			{
 				registry.AddComponent<KYEight::MeshComponent>(entity, KYEight::MeshComponent{});
@@ -164,6 +173,53 @@ namespace KYEightEditor
 			mesh.colour_.b = static_cast<unsigned char>(colour[2] * 255.f);
 			mesh.colour_.a = static_cast<unsigned char>(colour[3] * 255.f);
 		}
+	}
+	void Inspector::DrawDirectionalLight(KYEight::Registry& registry, KYEight::Entity entity) 
+	{
+		if (!registry.HasComponent<KYEight::DirectionalLight>(entity)) 
+		{
+			if (registry.HasComponent<KYEight::MeshComponent>(entity)) 
+			{
+				return;
+			}
+
+			if (ImGui::Button("Add Directional Light")) 
+			{
+				if (!registry.HasComponent<KYEight::Transform3D>(entity)) 
+				{
+					registry.AddComponent<KYEight::Transform3D>(entity, KYEight::Transform3D{});
+				}
+
+				registry.AddComponent<KYEight::DirectionalLight>(entity, KYEight::DirectionalLight{});
+			}
+
+			return;
+		}
+
+		auto& light = registry.GetComponent<KYEight::DirectionalLight>(entity);
+
+		if (!ImGui::CollapsingHeader("Directional Light", ImGuiTreeNodeFlags_DefaultOpen)) 
+		{
+			return;
+		}
+
+		float colour[4] =
+		{
+			light.colour_.r / 255.f,
+			light.colour_.g / 255.f,
+			light.colour_.b / 255.f,
+			light.colour_.a / 255.f
+		};
+
+		if (ImGui::ColorEdit4("Light Colour", colour)) 
+		{
+			light.colour_.r = static_cast<unsigned char>(colour[0] * 255.f);	
+			light.colour_.g = static_cast<unsigned char>(colour[1] * 255.f);	
+			light.colour_.b = static_cast<unsigned char>(colour[2] * 255.f);	
+			light.colour_.a = static_cast<unsigned char>(colour[3] * 255.f);	
+		}
+
+		ImGui::DragFloat("Intensity", &light.intensity_, 0.05f, 0.f, 10.f);
 	}
 
 	void Inspector::RefreshMeshAssets() 

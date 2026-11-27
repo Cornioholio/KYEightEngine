@@ -28,6 +28,7 @@ namespace KYEight
 		std::optional<NameComponent> name_;
 		std::optional<Transform3D> transform_;
 		std::optional<KYDomainMesh> mesh_;
+		std::optional<DirectionalLight> directionalLight_;	
 	};
 
 	/// <summary>
@@ -35,7 +36,7 @@ namespace KYEight
 	/// </summary>
 	struct KYDomain 
 	{
-		static constexpr int currentVersion_ = 3;
+		static constexpr int currentVersion_ = 4;
 
 		std::vector<KYDomainEntity> entities_;
 	};

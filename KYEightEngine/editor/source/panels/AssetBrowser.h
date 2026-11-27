@@ -21,6 +21,9 @@ namespace KYEightEditor
 		void RefreshDirectory();
 		void NavigateTo(const std::filesystem::path& directory);
 
+		// File importing
+		void ImportFile();
+
 		std::filesystem::path rootPath_;
 		std::filesystem::path currentPath_;	
 
@@ -31,5 +34,10 @@ namespace KYEightEditor
 		char searchBuffer_[256] = {};
 
 		std::string errorMessage_;
+
+		// Import feedback
+		std::string importMessage_;
+		bool importFailed_ = false;
+
 	};
 }

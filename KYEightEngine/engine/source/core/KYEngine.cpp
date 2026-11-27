@@ -61,7 +61,7 @@ namespace KYEight
 	{
 		renderer_->BeginFrame();
 
-		meshSystem_.Render(registry_, *resourceManager_, renderer_->GetCamera());
+		meshSystem_.Render(registry_, *resourceManager_, renderer_->GetCamera(), renderer_->GetLightingShader());
 
 		renderer_->EndFrame();
 

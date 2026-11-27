@@ -3,20 +3,51 @@
         {
             "mesh": {
                 "colour": [
-                    40,
-                    230,
-                    198,
+                    152,
+                    78,
+                    0,
                     255
                 ],
-                "filepath": "assets/models/Cube.obj",
+                "filepath": "assets/models/Suzanne.obj",
                 "source": "file"
             },
             "name": {
-                "value": "cubo"
+                "value": "Suzanne"
             },
             "transform": {
                 "position": [
-                    -0.10000000149011612,
+                    0.0,
+                    0.10000000149011612,
+                    0.0
+                ],
+                "rotation": [
+                    -37.5,
+                    36.79999923706055,
+                    0.0
+                ],
+                "scale": [
+                    3.0,
+                    3.0,
+                    3.0
+                ]
+            }
+        },
+        {
+            "directionalLight": {
+                "colour": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "intensity": 2.1500000953674316
+            },
+            "name": {
+                "value": "Light"
+            },
+            "transform": {
+                "position": [
+                    0.0,
                     0.0,
                     0.0
                 ],
@@ -33,5 +64,5 @@
             }
         }
     ],
-    "version": 3
+    "version": 4
 }

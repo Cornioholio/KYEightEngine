@@ -17,7 +17,7 @@ target_compile_features(KYEightEditor PRIVATE cxx_std_20)
 
 target_include_directories(KYEightEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
-target_link_libraries(KYEightEditor PRIVATE KYEight::Engine KYEight::GameLib KYEightRlImGui)
+target_link_libraries(KYEightEditor PRIVATE KYEight::Engine KYEight::GameLib KYEightRlImGui nfd)
 
 add_custom_target(KYEightEditorAssets ALL
 	COMMAND ${CMAKE_COMMAND} -E copy_directory 
